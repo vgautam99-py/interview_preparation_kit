@@ -2,21 +2,26 @@ const Kit = require('../models/Kit');
 const mongoose = require('mongoose');
 const { getPrioritizedFlashcards, updateCardConfidence } = require('../services/flashcard.service');
 
-// Safe Mongoose query helper for string IDs vs ObjectIds
-function getKitQuery(id) {
-  if (id && mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id)) {
-    return { $or: [{ _id: id }, { id }] };
+// Safe Mongoose query helper for string IDs vs ObjectIds with userId isolation
+function getKitQuery(id, userId) {
+  const query = (id && mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id))
+    ? { $or: [{ _id: id }, { id }] }
+    : { id };
+  if (userId) {
+    query.userId = userId;
   }
-  return { id };
+  return query;
 }
 
 async function getPracticeFlashcards(req, res) {
   const { kitId } = req.params;
   const { mode } = req.query; // 'weak' or 'all'
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
+
   try {
     let kit = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      kit = await Kit.findOne(getKitQuery(kitId));
+      kit = await Kit.findOne(getKitQuery(kitId, userId));
     }
     
     let flashcards = kit ? kit.flashcards || [] : [];
@@ -32,11 +37,12 @@ async function getPracticeFlashcards(req, res) {
 async function updateConfidence(req, res) {
   const { kitId } = req.params;
   const { cardId, confidence } = req.body;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
 
   try {
     let kit = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      kit = await Kit.findOne(getKitQuery(kitId));
+      kit = await Kit.findOne(getKitQuery(kitId, userId));
     }
 
     if (!kit) return res.status(404).json({ error: 'Kit not found' });
@@ -44,7 +50,7 @@ async function updateConfidence(req, res) {
     const updatedFlashcards = updateCardConfidence(kit.flashcards, cardId, confidence);
     
     if (Kit.db && Kit.db.readyState === 1) {
-      await Kit.updateOne(getKitQuery(kitId), { $set: { flashcards: updatedFlashcards } });
+      await Kit.updateOne(getKitQuery(kitId, userId), { $set: { flashcards: updatedFlashcards } });
     }
 
     res.json({ message: 'Confidence updated successfully', flashcards: updatedFlashcards });

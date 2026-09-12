@@ -33,11 +33,12 @@ async function crawlCompanyWebsite(companyUrl) {
   try {
     logger.info(`[Crawler] Fetching main page: ${targetUrl}`);
     const response = await axios.get(targetUrl, {
-      timeout: 3000,
+      timeout: 7000,
       headers: {
-        'User-Agent': 'AI-Interview-PrepKit-Crawler/1.0 (+https://interviewkit.local)'
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 AI-PrepKit/1.0',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
       },
-      maxContentLength: 1.5 * 1024 * 1024 // 1.5MB max
+      maxContentLength: 2.5 * 1024 * 1024 // 2.5MB max
     });
 
     if (typeof response.data !== 'string') {

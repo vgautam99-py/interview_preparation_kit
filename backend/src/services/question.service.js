@@ -215,12 +215,13 @@ function generateFallbackKitData(jobDescription, companyUrl, researchData, compa
 
   const lines = jobDescription.split('\n').map(l => l.trim()).filter(l => l.length > 15);
   
+  const extractedReqs = lines.slice(0, 5);
   const reqTexts = [
-    lines.find(l => /experience|years|proficient|knowledge/i.test(l)) || `${seniority} level experience in Software Engineering & Architecture`,
-    lines.find(l => /node|typescript|javascript|react|python|java/i.test(l)) || 'Strong proficiency in Full-Stack Technologies & Frameworks',
-    lines.find(l => /database|sql|mongo|postgres/i.test(l)) || 'Hands-on experience with Relational / NoSQL Databases & Schema Design',
-    lines.find(l => /testing|ci\/cd|cloud|aws|gcp/i.test(l)) || 'Familiarity with Automated Testing, CI/CD, and Cloud Infrastructure',
-    lines.find(l => /communication|leadership|agile/i.test(l)) || 'Excellent communication, system ownership, and cross-functional leadership'
+    extractedReqs[0] || `${finalSeniority} level experience and core domain expertise as ${finalRoleTitle}`,
+    extractedReqs[1] || `Proficiency in key tools, methodologies, and standards required for ${finalRoleTitle}`,
+    extractedReqs[2] || `Strong analytical, problem-solving, and operational execution capabilities at ${finalCompanyName}`,
+    extractedReqs[3] || `Compliance with industry regulations, quality assurance, and standard operating procedures`,
+    extractedReqs[4] || `Effective cross-functional communication, teamwork, and leadership skills`
   ];
 
   const requirements = [
@@ -235,37 +236,37 @@ function generateFallbackKitData(jobDescription, companyUrl, researchData, compa
   const questions = [];
   const flashcards = [];
 
-  const categories = ['System Design', 'Technical', 'Behavioral', 'Database Architecture', 'Security & Performance'];
+  const categories = ['Domain Mastery', 'Core Responsibilities', 'Quality & Compliance', 'Operational Problem Solving', 'Behavioral & Leadership'];
 
   const questionTemplates = [
     {
-      prompt: (c, r, s, i) => `[${s} Level] How would you design a highly available, fault-tolerant system for ${r} at ${c}?`,
-      answer: '1. Deconstruct requirement SLAs (99.99% availability)\n2. Database indexing, partitioning, and read replicas\n3. Microservices decoupling via event-driven messaging\n4. Monitoring, rate limiting, and graceful degradation'
+      prompt: (c, r, s, i) => `[${s} Level] As a ${r} at ${c}, how do you execute core clinical / operational responsibilities under high-pressure scenarios?`,
+      answer: `1. Systematic initial assessment and triage based on established protocol\n2. Priority management and clear task delegation\n3. Strict adherence to ${c}'s safety, regulatory, and quality guidelines\n4. Post-procedure documentation and continuous quality evaluation`
     },
     {
-      prompt: (c, r, s, i) => `[${s} Level] Explain advanced asynchronous queue handling and event loop optimization strategies for high throughput in ${c}'s core services.`,
-      answer: '1. Event loop profiling and CPU bound offloading via worker threads\n2. Backpressure management using stream pipelines\n3. Dead-letter queues and idempotency mechanisms'
+      prompt: (c, r, s, i) => `[${s} Level] Describe your methodology for ensuring quality assurance, risk mitigation, and compliance for ${r} position.`,
+      answer: `1. Regular audit of operational processes and compliance standards\n2. Root-cause analysis for any procedural variances or errors\n3. Implementation of corrective action plans and staff training\n4. Active communication with regulatory bodies and internal audit teams`
     },
     {
-      prompt: (c, r, s, i) => `[${s} Level] How do you design high-efficiency database index schemas to eliminate collection scan bottlenecks?`,
-      answer: '1. ESR (Equality, Sort, Range) rule alignment\n2. Explain plan query execution inspection\n3. Write concern vs read preference trade-offs'
+      prompt: (c, r, s, i) => `[${s} Level] Walk us through a complex case or project you managed as ${r} that required cross-functional coordination.`,
+      answer: `1. Situation & Task overview outlining key objectives and constraints\n2. Collaborative action plan engaging interdisciplinary team members\n3. Overcoming communication barriers and resource bottlenecks\n4. Quantifiable positive outcome and key takeaways for ${c}`
     },
     {
-      prompt: (c, r, s, i) => `[${s} Level] Describe your automated CI/CD pipeline strategy for zero-downtime microservice deployments.`,
-      answer: '1. Blue-Green / Canary deployment traffic routing\n2. Automated smoke tests & rollback health checks\n3. Infrastructure-as-code and container vulnerability scanning'
+      prompt: (c, r, s, i) => `[${s} Level] How do you handle unexpected complications or emergency situations while serving as ${r}?`,
+      answer: `1. Rapid critical thinking and emergency response protocols\n2. De-escalation techniques and calm, authoritative communication\n3. Immediate escalation to senior leadership / medical direction when required\n4. Thorough incident documentation and debriefing`
     },
     {
-      prompt: (c, r, s, i) => `[${s} Level] Describe how you handle conflicting technical priorities under tight deadlines while preserving code quality.`,
-      answer: '1. STAR framework (Situation, Task, Action, Result)\n2. Explicit trade-off evaluation (Tech Debt vs Speed to Market)\n3. Stakeholder alignment & clear roadmap renegotiation'
+      prompt: (c, r, s, i) => `[${s} Level] Describe a situation where you had to adapt quickly to new protocols or technology platforms at ${c}.`,
+      answer: `1. Proactive learning mindset and quick adoption of updated guidelines\n2. Hands-on practice and peer knowledge-sharing\n3. Validating competency through testing and supervisor evaluation\n4. Assisting team members in seamless transition`
     }
   ];
 
   const flashcardTemplates = [
-    { front: 'What is the ESR Rule in Indexing?', back: 'Equality fields first, Sort fields second, Range fields last in compound database indexes.' },
-    { front: 'Difference between process.nextTick and setImmediate in Node.js?', back: 'process.nextTick executes immediately after current phase; setImmediate runs in the Check phase.' },
-    { front: 'What is SSRF and how do you prevent it?', back: 'Server-Side Request Forgery occurs when server fetches untrusted URLs; mitigate by strict domain white-listing and blocking private IP ranges.' },
-    { front: 'What is a Canary Deployment?', back: 'Rolling out new code to a small subset of users (5-10%) to monitor error metrics before full production rollout.' },
-    { front: 'What is Idempotency in API Design?', back: 'Ensuring an operation produces the same result no matter how many times it is repeatedly invoked (e.g., using Idempotency-Key headers).' }
+    { front: `What is the primary responsibility of a ${finalRoleTitle}?`, back: `To deliver high-quality patient care / professional services adhering to industry standards and ${finalCompanyName} protocols.` },
+    { front: `How do you ensure strict compliance in ${finalRoleTitle} workflows?`, back: `By following standard operating procedures, completing mandatory documentation, and participating in regular audits.` },
+    { front: `What critical steps are taken during an emergency response in ${finalRoleTitle}?`, back: `Immediate patient / situation stabilization, rapid triage, notification of lead team, and execution of emergency protocols.` },
+    { front: `Why is effective documentation crucial for ${finalRoleTitle}?`, back: `Ensures continuity of care, legal compliance, accurate reporting, and transparent communication across departments.` },
+    { front: `What is the key to managing high workload as ${finalRoleTitle}?`, back: `Prioritizing critical tasks, delegating appropriately, maintaining open team communication, and managing time efficiently.` }
   ];
 
   for (let i = 0; i < totalQuestions; i++) {
@@ -278,7 +279,7 @@ function generateFallbackKitData(jobDescription, companyUrl, researchData, compa
       requirement_ids: [`REQ-${(i % 5) + 1}`],
       category: categories[i % categories.length],
       prompt: qTmpl.prompt(finalCompanyName, finalRoleTitle, finalSeniority, i + 1),
-      answer_outline: `${qTmpl.answer}\n5. Seniority Depth (${finalSeniority}): Tailored analysis considering cost, scale, and operational simplicity.`,
+      answer_outline: `${qTmpl.answer}\n5. Seniority Depth (${finalSeniority}): Tailored execution reflecting professional standards and leadership expectations.`,
       difficulty: (i % 3) + 1,
       completed: false,
       state: 'generated'
@@ -299,14 +300,14 @@ function generateFallbackKitData(jobDescription, companyUrl, researchData, compa
       company: finalCompanyName,
       company_url: companyUrl || '',
       role: finalRoleTitle,
-      location: 'Remote / Hybrid',
+      location: 'Remote / On-site',
       jd_chars: jobDescription.length,
       researched_at: new Date(),
       pages_used: researchData.pagesUsed || []
     },
     company_brief: {
-      summary: `${finalCompanyName} is actively hiring and preparing candidates for the ${finalRoleTitle} (${finalSeniority}) position.`,
-      what_they_do: `Provides web services, scalable APIs, and software solutions tailored for modern business operations at ${finalCompanyName}.`,
+      summary: `${finalCompanyName} is actively recruiting qualified professionals for the ${finalRoleTitle} (${finalSeniority}) position.`,
+      what_they_do: `Delivers dedicated services and operational excellence tailored to their sector at ${finalCompanyName}.`,
       sources: researchData.pagesUsed || [],
       state: 'generated'
     },
@@ -314,9 +315,9 @@ function generateFallbackKitData(jobDescription, companyUrl, researchData, compa
       title: finalRoleTitle,
       seniority: finalSeniority,
       responsibilities: [
-        `Architect and implement reliable web applications and microservices for ${finalRoleTitle}`,
-        `Lead code reviews, enforce design standards, and mentor engineers at ${finalCompanyName}`,
-        `Ensure system reliability, security compliance, and performance optimization`
+        `Execute core domain duties and deliver high-quality outcomes for ${finalRoleTitle}`,
+        `Ensure adherence to safety, quality, and regulatory standards at ${finalCompanyName}`,
+        `Collaborate with interdisciplinary teams and mentor junior staff members`
       ],
       requirements: requirements.map(r => r.text)
     },

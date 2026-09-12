@@ -146,6 +146,15 @@ export default function FlashcardsPage() {
     }
   };
 
+  // Move to previous card in flow
+  const handlePrevCard = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+      setIsRevealed(false);
+      setSelectedConfidence(null);
+    }
+  };
+
   // Move to next card in flow
   const handleNextCard = () => {
     if (currentIndex + 1 < cards.length) {

@@ -501,7 +501,7 @@ export default function ProfilePage() {
 
               <div className="flex items-center gap-2">
                 {/* Filter Button */}
-                <div className="relative">
+                <div className="relative z-20">
                   <button
                     type="button"
                     onClick={() => setShowPaymentFilterDropdown(!showPaymentFilterDropdown)}
@@ -522,7 +522,7 @@ export default function ProfilePage() {
 
                   {/* Filter Dropdown Menu */}
                   {showPaymentFilterDropdown && (
-                    <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-30 space-y-1 animate-fadeIn text-xs">
+                    <div className="absolute right-0 mt-2 w-48 max-w-[calc(100vw-2.5rem)] bg-white border border-slate-200 rounded-2xl shadow-2xl p-1.5 z-50 space-y-1 animate-fadeIn text-xs">
                       {[
                         { id: 'ALL', label: 'All Transactions' },
                         { id: 'THIS_MONTH', label: 'This Month' },

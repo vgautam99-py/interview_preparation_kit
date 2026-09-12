@@ -16,9 +16,9 @@ function cleanJsonResponse(rawText) {
 }
 
 /**
- * Calls Gemini API with 5s timeout guard or returns structured fallback output.
+ * Calls Gemini API with 25s timeout guard or returns structured fallback output.
  */
-async function generateLlmJson(prompt, systemInstruction = '', timeoutMs = 5000) {
+async function generateLlmJson(prompt, systemInstruction = '', timeoutMs = 25000) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (apiKey && apiKey.trim() !== '' && apiKey !== 'your_gemini_api_key_here') {
@@ -39,7 +39,7 @@ async function generateLlmJson(prompt, systemInstruction = '', timeoutMs = 5000)
           ? `${systemInstruction}\n\nUSER PROMPT:\n${prompt}` 
           : prompt;
 
-        // 5-second timeout race to ensure fast response
+        // 25-second timeout race to ensure full response generation
         const timeoutPromise = new Promise((_, reject) =>
           setTimeout(() => reject(new Error(`LLM generation timeout (${timeoutMs}ms)`)), timeoutMs)
         );
