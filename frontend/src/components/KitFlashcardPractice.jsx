@@ -247,12 +247,29 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
         /* ACTIVE FLASHCARD CONTAINER */
         <div className="space-y-6">
           {/* Main Flashcard Card */}
-          <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm space-y-6 relative min-h-[300px] flex flex-col justify-between">
-            {/* Top Subhead */}
-            <div className="text-center">
-              <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-widest">
+          <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6 relative min-h-[300px] flex flex-col justify-between">
+            {/* Top Header Row Inside Flashcard Box: Circled Previous Arrow, Flashcard X of Y, Circled Next Arrow */}
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <button
+                onClick={handlePrevCard}
+                disabled={currentIndex === 0}
+                title="Previous Flashcard"
+                className="w-10 h-10 rounded-full border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 hover:text-indigo-600 shadow-sm transition flex items-center justify-center shrink-0"
+              >
+                <ChevronLeft className="w-5 h-5 font-bold" />
+              </button>
+
+              <span className="text-xs font-mono font-bold text-slate-500 uppercase tracking-widest text-center">
                 FLASHCARD {currentIndex + 1} OF {totalCards}
               </span>
+
+              <button
+                onClick={handleNextCard}
+                title="Next Flashcard"
+                className="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition flex items-center justify-center shrink-0 hover:shadow-indigo-600/30"
+              >
+                <ChevronRight className="w-5 h-5 font-bold" />
+              </button>
             </div>
 
             {/* Content Area */}
@@ -315,7 +332,7 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
             </div>
           </div>
 
-          {/* Confidence Rating Bar & Next Button */}
+          {/* Confidence Rating Bar */}
           <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-5">
             <div>
               <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
@@ -346,26 +363,6 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
                   </button>
                 );
               })}
-            </div>
-
-            {/* Dual Navigation Controls: Previous and Next Buttons */}
-            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
-              <button
-                onClick={handlePrevCard}
-                disabled={currentIndex === 0}
-                className="flex-1 sm:flex-none px-6 py-3 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-800 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 border border-slate-200 shadow-sm"
-              >
-                <ChevronLeft className="w-4 h-4" />
-                <span>Previous</span>
-              </button>
-
-              <button
-                onClick={handleNextCard}
-                className="flex-1 sm:flex-none px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md hover:shadow-indigo-600/30"
-              >
-                <span>Next</span>
-                <ChevronRight className="w-4 h-4" />
-              </button>
             </div>
           </div>
         </div>

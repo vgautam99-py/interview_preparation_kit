@@ -3,7 +3,7 @@ import Navbar from '../components/layout/Navbar';
 import Sidebar from '../components/layout/Sidebar';
 import { useAuth } from '../context/AuthContext';
 import api from '../lib/api';
-import { User, Mail, ShieldCheck, CreditCard, LogOut, RefreshCw, Plus, Lock, Key, Calendar, Check, X, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { User, Mail, ShieldCheck, CreditCard, LogOut, RefreshCw, Plus, Lock, Key, Calendar, Check, X, ArrowRight, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const defaultAvatars = [
@@ -18,6 +18,11 @@ const defaultAvatars = [
 export default function ProfilePage() {
   const { user, setUser, logout, refreshUserData } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Payment History States & Filters
+  const [showAllPayments, setShowAllPayments] = useState(false);
+  const [paymentFilter, setPaymentFilter] = useState('ALL'); // ALL | THIS_MONTH | LAST_MONTH | LAST_30_DAYS | LAST_90_DAYS
+  const [showPaymentFilterDropdown, setShowPaymentFilterDropdown] = useState(false);
   const [expandedPayments, setExpandedPayments] = useState({});
 
   const togglePaymentExpand = (idx) => {
@@ -488,109 +493,219 @@ export default function ProfilePage() {
 
           {/* Razorpay Payment Transactions History */}
           <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-3 flex items-center justify-between">
-              <span>Razorpay Transaction History</span>
-              <button onClick={refreshUserData} className="text-xs text-indigo-600 hover:underline flex items-center gap-1 font-semibold">
-                <RefreshCw className="w-3.5 h-3.5" /> Refresh History
-              </button>
-            </h3>
+            <div className="border-b border-slate-100 pb-3 flex flex-wrap items-center justify-between gap-3">
+              <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+                <CreditCard className="w-4 h-4 text-indigo-600" />
+                <span>Razorpay Transaction History</span>
+              </h3>
+
+              <div className="flex items-center gap-2">
+                {/* Filter Button */}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowPaymentFilterDropdown(!showPaymentFilterDropdown)}
+                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 shadow-xs ${
+                      paymentFilter !== 'ALL'
+                        ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-600/20'
+                        : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    <Filter className="w-3.5 h-3.5" />
+                    <span>Filter</span>
+                    {paymentFilter !== 'ALL' && (
+                      <span className="bg-white text-indigo-700 text-[10px] px-1.5 py-0.2 rounded-full font-black">
+                        {paymentFilter === 'THIS_MONTH' ? 'This Month' : paymentFilter === 'LAST_MONTH' ? 'Last Month' : paymentFilter === 'LAST_30_DAYS' ? '30 Days' : '90 Days'}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Filter Dropdown Menu */}
+                  {showPaymentFilterDropdown && (
+                    <div className="absolute right-0 mt-2 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-30 space-y-1 animate-fadeIn text-xs">
+                      {[
+                        { id: 'ALL', label: 'All Transactions' },
+                        { id: 'THIS_MONTH', label: 'This Month' },
+                        { id: 'LAST_MONTH', label: 'Last Month' },
+                        { id: 'LAST_30_DAYS', label: 'Last 30 Days' },
+                        { id: 'LAST_90_DAYS', label: 'Last 90 Days' },
+                      ].map((opt) => (
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => {
+                            setPaymentFilter(opt.id);
+                            setShowPaymentFilterDropdown(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 rounded-xl transition flex items-center justify-between font-semibold ${
+                            paymentFilter === opt.id
+                              ? 'bg-indigo-50 text-indigo-700 font-bold'
+                              : 'text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>{opt.label}</span>
+                          {paymentFilter === opt.id && <Check className="w-3.5 h-3.5 text-indigo-600" />}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={refreshUserData}
+                  className="text-xs text-indigo-600 hover:underline flex items-center gap-1 font-semibold px-2 py-1"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" /> Refresh
+                </button>
+              </div>
+            </div>
 
             {user?.paymentHistory && user.paymentHistory.length > 0 ? (
-              <>
-                {/* Desktop Table View (>= 768px) */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="w-full text-left text-xs">
-                    <thead>
-                      <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase">
-                        <th className="pb-2">Order ID</th>
-                        <th className="pb-2">Payment ID</th>
-                        <th className="pb-2">Plan</th>
-                        <th className="pb-2">Amount</th>
-                        <th className="pb-2">Date</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      {user.paymentHistory.map((item, idx) => (
-                        <tr key={idx} className="hover:bg-slate-50">
-                          <td className="py-3 font-mono font-medium text-slate-700">{item.orderId}</td>
-                          <td className="py-3 font-mono text-slate-500">{item.paymentId}</td>
-                          <td className="py-3 font-semibold text-indigo-600">{item.plan || 'Pro'}</td>
-                          <td className="py-3 font-bold text-slate-900">₹{item.amount}</td>
-                          <td className="py-3 text-slate-500">{new Date(item.date).toLocaleDateString()}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              (() => {
+                const now = new Date();
+                const filteredPayments = user.paymentHistory.filter(item => {
+                  if (!item.date) return true;
+                  const itemDate = new Date(item.date);
+                  if (paymentFilter === 'THIS_MONTH') {
+                    return itemDate.getMonth() === now.getMonth() && itemDate.getFullYear() === now.getFullYear();
+                  }
+                  if (paymentFilter === 'LAST_MONTH') {
+                    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+                    return itemDate.getMonth() === lastMonth.getMonth() && itemDate.getFullYear() === lastMonth.getFullYear();
+                  }
+                  if (paymentFilter === 'LAST_30_DAYS') {
+                    const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                    return itemDate >= thirtyDaysAgo;
+                  }
+                  if (paymentFilter === 'LAST_90_DAYS') {
+                    const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
+                    return itemDate >= ninetyDaysAgo;
+                  }
+                  return true;
+                });
 
-                {/* Mobile Card View (< 768px) */}
-                <div className="block md:hidden space-y-3">
-                  {user.paymentHistory.map((item, idx) => {
-                    const isExpanded = !!expandedPayments[idx];
-                    return (
-                      <div key={idx} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 transition-all">
-                        {/* Top summary row: Order ID, Amount, Date, See Details button */}
-                        <div className="space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Order ID</span>
-                            <span className="font-extrabold text-slate-900 text-sm">₹{item.amount}</span>
-                          </div>
-                          <div className="font-mono text-xs font-semibold text-slate-800 break-all">
-                            {item.orderId}
-                          </div>
-                          <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
-                            <span className="font-medium text-slate-600">{new Date(item.date).toLocaleDateString()}</span>
-                            <button
-                              type="button"
-                              onClick={() => togglePaymentExpand(idx)}
-                              className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl border border-indigo-100 transition shadow-sm"
-                            >
-                              <span>{isExpanded ? 'Hide Details' : 'See Details'}</span>
-                              <ArrowRight className={`w-3.5 h-3.5 font-bold transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
-                            </button>
-                          </div>
-                        </div>
+                const displayedPayments = showAllPayments ? filteredPayments : filteredPayments.slice(0, 3);
 
-                        {/* Collapsible expanded detail panel */}
-                        {isExpanded && (
-                          <div className="pt-3 border-t border-slate-200 text-xs space-y-2.5 bg-white p-3.5 rounded-xl border border-slate-100 shadow-inner">
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-slate-500 font-medium">Order ID:</span>
-                              <span className="font-mono font-semibold text-slate-800 break-all text-right max-w-[200px]">{item.orderId}</span>
+                if (filteredPayments.length === 0) {
+                  return (
+                    <div className="text-center py-8 bg-slate-50 rounded-2xl border border-slate-200 space-y-1">
+                      <p className="text-xs font-bold text-slate-700">No payment transactions found for this date filter</p>
+                      <button
+                        onClick={() => setPaymentFilter('ALL')}
+                        className="text-xs text-indigo-600 hover:underline font-bold"
+                      >
+                        Reset Filter
+                      </button>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="space-y-4">
+                    {/* Desktop Table View (>= 768px) */}
+                    <div className="hidden md:block overflow-x-auto">
+                      <table className="w-full text-left text-xs">
+                        <thead>
+                          <tr className="border-b border-slate-100 text-slate-400 font-semibold uppercase">
+                            <th className="pb-2">Order ID</th>
+                            <th className="pb-2">Payment ID</th>
+                            <th className="pb-2">Plan</th>
+                            <th className="pb-2">Amount</th>
+                            <th className="pb-2">Date</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          {displayedPayments.map((item, idx) => (
+                            <tr key={idx} className="hover:bg-slate-50">
+                              <td className="py-3 font-mono font-medium text-slate-700">{item.orderId}</td>
+                              <td className="py-3 font-mono text-slate-500">{item.paymentId}</td>
+                              <td className="py-3 font-semibold text-indigo-600">{item.plan || 'Pro'}</td>
+                              <td className="py-3 font-bold text-slate-900">₹{item.amount}</td>
+                              <td className="py-3 text-slate-500">{new Date(item.date).toLocaleDateString()}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+
+                    {/* Mobile Card View (< 768px) */}
+                    <div className="block md:hidden space-y-3">
+                      {displayedPayments.map((item, idx) => {
+                        const isExpanded = !!expandedPayments[idx];
+                        return (
+                          <div key={idx} className="bg-slate-50 border border-slate-200 rounded-2xl p-4 space-y-3 transition-all">
+                            {/* Top summary row */}
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <span className="text-slate-400 font-semibold uppercase text-[10px] tracking-wider">Order ID</span>
+                                <span className="font-extrabold text-slate-900 text-sm">₹{item.amount}</span>
+                              </div>
+                              <div className="font-mono text-xs font-semibold text-slate-800 break-all">
+                                {item.orderId}
+                              </div>
+                              <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
+                                <span className="font-medium text-slate-600">{new Date(item.date).toLocaleDateString()}</span>
+                                <button
+                                  type="button"
+                                  onClick={() => togglePaymentExpand(idx)}
+                                  className="inline-flex items-center gap-1.5 text-xs font-bold text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-xl border border-indigo-100 transition shadow-sm"
+                                >
+                                  <span>{isExpanded ? 'Hide Details' : 'See Details'}</span>
+                                  <ArrowRight className={`w-3.5 h-3.5 font-bold transition-transform duration-200 ${isExpanded ? 'rotate-90' : ''}`} />
+                                </button>
+                              </div>
                             </div>
-                            <div className="flex justify-between items-start gap-2">
-                              <span className="text-slate-500 font-medium">Payment ID:</span>
-                              <span className="font-mono text-slate-700 break-all text-right max-w-[200px]">{item.paymentId || 'N/A'}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-500 font-medium">Plan:</span>
-                              <span className="font-bold text-indigo-600">{item.plan || 'Pro Plan'}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-500 font-medium">Amount Paid:</span>
-                              <span className="font-bold text-slate-900">₹{item.amount}</span>
-                            </div>
-                            <div className="flex justify-between items-center">
-                              <span className="text-slate-500 font-medium">Date & Time:</span>
-                              <span className="text-slate-700 font-medium">{new Date(item.date).toLocaleString()}</span>
-                            </div>
-                            <div className="flex justify-between items-center pt-1 border-t border-slate-100">
-                              <span className="text-slate-500 font-medium">Status:</span>
-                              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">
-                                <Check className="w-3 h-3" /> Success
-                              </span>
-                            </div>
+
+                            {/* Collapsible expanded detail panel */}
+                            {isExpanded && (
+                              <div className="pt-3 border-t border-slate-200 text-xs space-y-2.5 bg-white p-3.5 rounded-xl border border-slate-100 shadow-inner">
+                                <div className="flex justify-between items-start gap-2">
+                                  <span className="text-slate-500 font-medium">Order ID:</span>
+                                  <span className="font-mono font-semibold text-slate-800 break-all text-right max-w-[200px]">{item.orderId}</span>
+                                </div>
+                                <div className="flex justify-between items-start gap-2">
+                                  <span className="text-slate-500 font-medium">Payment ID:</span>
+                                  <span className="font-mono text-slate-700 break-all text-right max-w-[200px]">{item.paymentId || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-slate-500 font-medium">Plan:</span>
+                                  <span className="font-bold text-indigo-600">{item.plan || 'Pro Plan'}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-slate-500 font-medium">Amount Paid:</span>
+                                  <span className="font-bold text-slate-900">₹{item.amount}</span>
+                                </div>
+                                <div className="flex justify-between items-center">
+                                  <span className="text-slate-500 font-medium">Date & Time:</span>
+                                  <span className="text-slate-700 font-medium">{new Date(item.date).toLocaleString()}</span>
+                                </div>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        );
+                      })}
+                    </div>
+
+                    {/* Show More / Show Less Button */}
+                    {filteredPayments.length > 3 && (
+                      <div className="text-center pt-2 border-t border-slate-100">
+                        <button
+                          type="button"
+                          onClick={() => setShowAllPayments(!showAllPayments)}
+                          className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 border border-slate-200 shadow-sm"
+                        >
+                          <span>{showAllPayments ? 'Show Less' : `Show More (${filteredPayments.length - 3} more)`}</span>
+                          {showAllPayments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                        </button>
                       </div>
-                    );
-                  })}
-                </div>
-              </>
+                    )}
+                  </div>
+                );
+              })()
             ) : (
-              <div className="py-8 text-center text-slate-400 text-xs space-y-2">
-                <CreditCard className="w-8 h-8 mx-auto text-slate-300" />
-                <p>No Razorpay payment history recorded yet.</p>
+              <div className="text-center py-8 bg-slate-50 rounded-2xl border border-slate-200">
+                <p className="text-xs font-medium text-slate-500">No payment transaction records found.</p>
               </div>
             )}
           </div>

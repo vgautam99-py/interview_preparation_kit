@@ -159,6 +159,8 @@ export default function FlashcardsPage() {
 
   const currentCard = cards[currentIndex];
   const totalCards = cards.length;
+  const selectedKit = kits.find(k => (k.id || k._id) === selectedKitId);
+  const seniority = selectedKit?.role?.seniority || currentCard?.seniority || 'Senior';
 
   // Calculate statistics for Overview
   const confidentCount = cards.filter(c => c.confidence >= 4).length;
@@ -306,7 +308,7 @@ export default function FlashcardsPage() {
               {/* Overall Confidence Bar */}
               <div className="space-y-1.5 pt-1 border-t border-slate-100">
                 <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-                  <span>Overall confidence</span>
+                  <span>Overall Confidence</span>
                   <span className="font-mono text-indigo-600">{overallConfidencePct}%</span>
                 </div>
                 <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden p-0.5 border border-slate-200">
@@ -326,22 +328,22 @@ export default function FlashcardsPage() {
             </div>
           ) : !selectedKitId ? (
             /* DEFAULT STATE: SELECT COMPANY AND ROLE PROMPT */
-            <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4 max-w-lg mx-auto">
-              <div className="w-16 h-16 rounded-2xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center mx-auto text-3xl shadow-sm">
+            <div className="bg-white rounded-3xl border border-slate-200 p-8 text-center space-y-4 shadow-sm max-w-lg mx-auto">
+              <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-2xl">
                 🎴
               </div>
-              <div className="space-y-1.5">
-                <h4 className="text-slate-900 font-extrabold text-xl">Select Company & Role</h4>
-                <p className="text-slate-500 text-xs leading-relaxed max-w-sm mx-auto font-medium">
-                  Please select a company and role from the dropdown above to start practicing flashcards tailored for your interview prep.
+              <div className="space-y-1">
+                <h3 className="text-lg font-extrabold text-slate-900">Select a Kit to Practice</h3>
+                <p className="text-xs text-slate-500 max-w-sm mx-auto">
+                  Choose an interview prep kit from the dropdown menu above to start testing your knowledge with flashcards.
                 </p>
               </div>
             </div>
           ) : kits.length === 0 || cards.length === 0 ? (
             /* Empty State */
-            <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 shadow-sm space-y-4 max-w-lg mx-auto">
+            <div className="bg-white rounded-3xl border border-slate-200 p-8 text-center space-y-4 shadow-sm max-w-lg mx-auto">
               <div className="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center mx-auto text-2xl">
-                🎴
+                📚
               </div>
               <div className="space-y-1">
                 <h4 className="text-slate-900 font-extrabold text-lg">No flashcards in database yet</h4>
@@ -365,38 +367,66 @@ export default function FlashcardsPage() {
               </div>
 
               <div className="space-y-2">
-                <h2 className="text-2xl font-black text-slate-900">🎉 Session Complete</h2>
-                <div className="text-xs font-bold text-slate-600">
-                  {totalCards} / {totalCards} Cards
+                <h2 className="text-2xl font-black text-slate-900">🎉 Practice Session Complete</h2>
+                <p className="text-xs text-slate-500">
+                  Great job reviewing your flashcards! Here is your session breakdown:
+                </p>
+              </div>
+
+              {/* 3 Stats Grid Cards */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                  <div className="text-3xl font-black text-slate-900 font-mono">
+                    {sessionReviewedCount}
+                  </div>
+                  <div className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mt-1">
+                    Cards Reviewed
+                  </div>
+                </div>
+
+                <div className="p-3 bg-indigo-50 rounded-2xl border border-indigo-100">
+                  <div className="text-3xl font-black text-indigo-600 font-mono">
+                    {sessionAvgScore}
+                  </div>
+                  <div className="text-[10px] font-bold text-indigo-700 uppercase tracking-wider mt-1">
+                    Avg Confidence
+                  </div>
+                </div>
+
+                <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100">
+                  <div className="text-3xl font-black text-emerald-600 font-mono">
+                    {sessionStrongCount}
+                  </div>
+                  <div className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider mt-1">
+                    Strong Cards
+                  </div>
                 </div>
               </div>
 
-              {/* Average Confidence & Breakdown */}
-              <div className="bg-slate-50 rounded-2xl border border-slate-200 p-5 space-y-2">
-                <div className="text-xs font-bold text-slate-500 uppercase tracking-wider">Average Confidence</div>
-                <div className="text-3xl font-black text-slate-900 font-mono">
-                  {sessionAvgScore} <span className="text-base text-slate-400 font-normal">/ 5</span>
-                </div>
-                <p className="text-xs font-bold text-indigo-600 pt-1">
-                  {sessionStrongCount} cards strong • {sessionReviewCount} need review
-                </p>
-              </div>
+              {/* Summary message */}
+              <p className="text-xs text-slate-600 font-medium bg-slate-50 p-4 rounded-2xl border border-slate-200 leading-relaxed">
+                {sessionStrongCount >= totalCards * 0.7
+                  ? '🌟 Excellent performance! You have mastered most concepts in this kit.'
+                  : '💡 Good effort! Review your weak cards again to boost your confidence rating.'}
+              </p>
 
               {/* Action Buttons */}
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
                 <button
-                  onClick={handlePracticeWeakCards}
-                  className="w-full sm:w-auto px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2"
+                  onClick={() => {
+                    setSessionCompleted(false);
+                    setCurrentIndex(0);
+                    setIsRevealed(false);
+                  }}
+                  className="w-full sm:w-auto px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-bold transition shadow-md flex items-center justify-center gap-2"
                 >
-                  <Target className="w-4 h-4" />
-                  Practice Weak Cards
+                  <RotateCcw className="w-4 h-4" /> Practice Again
                 </button>
 
                 <button
                   onClick={() => navigate('/dashboard')}
-                  className="w-full sm:w-auto px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold transition border border-slate-200 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-5 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2"
                 >
-                  <ArrowLeft className="w-4 h-4" />
                   Back to Dashboard
                 </button>
               </div>
@@ -405,12 +435,29 @@ export default function FlashcardsPage() {
             /* SECTION 2, 3, 4: ACTIVE FLASHCARD & CONFIDENCE RECORDING UI */
             <div className="space-y-6">
               {/* Centerpiece Flashcard Container */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm space-y-6 relative min-h-[320px] flex flex-col justify-between">
-                {/* Header: Flashcard X of Y */}
-                <div className="text-center">
-                  <span className="text-xs font-mono font-bold text-slate-400 uppercase tracking-wider">
+              <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6 relative min-h-[320px] flex flex-col justify-between">
+                {/* Top Header Row Inside Flashcard Box: Circled Previous Arrow, Flashcard X of Y, Circled Next Arrow */}
+                <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <button
+                    onClick={handlePrevCard}
+                    disabled={currentIndex === 0}
+                    title="Previous Flashcard"
+                    className="w-10 h-10 rounded-full border border-slate-200 bg-slate-50 hover:bg-indigo-50 hover:border-indigo-200 disabled:opacity-30 disabled:cursor-not-allowed text-slate-700 hover:text-indigo-600 shadow-sm transition flex items-center justify-center shrink-0"
+                  >
+                    <ChevronLeft className="w-5 h-5 font-bold" />
+                  </button>
+
+                  <span className="text-xs font-mono font-bold text-slate-500 uppercase tracking-wider text-center">
                     Flashcard {currentIndex + 1} of {totalCards}
                   </span>
+
+                  <button
+                    onClick={handleNextCard}
+                    title="Next Flashcard"
+                    className="w-10 h-10 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white shadow-md transition flex items-center justify-center shrink-0 hover:shadow-indigo-600/30"
+                  >
+                    <ChevronRight className="w-5 h-5 font-bold" />
+                  </button>
                 </div>
 
                 {/* Card Content Area */}
@@ -480,7 +527,7 @@ export default function FlashcardsPage() {
                 </div>
               </div>
 
-              {/* CONFIDENCE RATING & NEXT CARD SECTION */}
+              {/* CONFIDENCE RATING SECTION */}
               <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-5">
                 <div>
                   <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
@@ -511,26 +558,6 @@ export default function FlashcardsPage() {
                       </button>
                     );
                   })}
-                </div>
-
-                {/* Dual Navigation Controls: Previous and Next Buttons */}
-                <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
-                  <button
-                    onClick={handlePrevCard}
-                    disabled={currentIndex === 0}
-                    className="flex-1 sm:flex-none px-6 py-3 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-800 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 border border-slate-200 shadow-sm"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                    <span>Previous</span>
-                  </button>
-
-                  <button
-                    onClick={handleNextCard}
-                    className="flex-1 sm:flex-none px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md hover:shadow-indigo-600/30"
-                  >
-                    <span>Next</span>
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
                 </div>
               </div>
             </div>
