@@ -116,19 +116,20 @@ async function login(req, res) {
     }
 
     if (mongoose.connection.readyState === 1) {
-      const user = await User.findOne({ email });
+      const targetEmail = email.toLowerCase().trim();
+      const user = await User.findOne({ email: targetEmail });
       if (!user) return res.status(400).json({ error: 'Invalid email or password.' });
 
       const isMatch = await bcrypt.compare(password, user.passwordHash);
       if (!isMatch) return res.status(400).json({ error: 'Invalid email or password.' });
 
-      user.isVerified = true;
-
       const accessToken = jwt.sign({ userId: user._id.toString(), email: user.email, name: user.name }, JWT_SECRET, { expiresIn: '15m' });
       const refreshToken = jwt.sign({ userId: user._id.toString() }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
-      user.refreshToken = refreshToken;
-      await user.save();
+      // Asynchronous non-blocking update to avoid delaying HTTP response
+      User.updateOne({ _id: user._id }, { $set: { isVerified: true, refreshToken } }).catch(err => {
+        console.warn('[MongoDB] Non-critical user token update warning:', err.message);
+      });
 
       setAuthCookies(res, accessToken, refreshToken);
 
