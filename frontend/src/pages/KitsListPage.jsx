@@ -25,6 +25,7 @@ export default function KitsListPage() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [tabFilter, setTabFilter] = useState('All'); // All | In Progress | Completed | Recently Added
+  const [showFilters, setShowFilters] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Modal State for Kit Rename
@@ -150,9 +151,9 @@ export default function KitsListPage() {
               </Link>
             </div>
 
-            {/* Search Input Bar */}
-            <div className="pt-2 border-t border-slate-100">
-              <div className="relative w-full max-w-lg">
+            {/* Search Bar & Filter Icon Button */}
+            <div className="pt-2 border-t border-slate-100 flex flex-wrap items-center gap-3">
+              <div className="relative flex-1 min-w-[240px] max-w-lg">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
                 <input
                   type="text"
@@ -162,24 +163,47 @@ export default function KitsListPage() {
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 text-slate-800 placeholder-slate-400 font-medium"
                 />
               </div>
+
+              {/* Filter Icon Button */}
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`px-4 py-2.5 rounded-xl border text-xs font-extrabold transition flex items-center gap-2 shadow-sm ${
+                  showFilters || tabFilter !== 'All'
+                    ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-600/20'
+                    : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                }`}
+              >
+                <Filter className="w-4 h-4" />
+                <span>Filter</span>
+                {tabFilter !== 'All' && (
+                  <span className="bg-white text-indigo-700 text-[10px] px-1.5 py-0.5 rounded-full font-black ml-0.5">
+                    {tabFilter}
+                  </span>
+                )}
+              </button>
             </div>
 
-            {/* Filter Tabs: All, In Progress, Completed, Recently Added */}
-            <div className="flex flex-wrap items-center gap-2 pt-2 text-xs font-semibold">
-              {['All', 'In Progress', 'Completed', 'Recently Added'].map(tab => (
-                <button
-                  key={tab}
-                  onClick={() => setTabFilter(tab)}
-                  className={`px-4 py-2 rounded-xl transition ${
-                    tabFilter === tab
-                      ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20'
-                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
-            </div>
+            {/* Filter Options (Toggled by Filter Icon Button) */}
+            {showFilters && (
+              <div className="flex flex-wrap items-center gap-2 pt-3 pb-1 border-t border-slate-100 animate-fadeIn">
+                <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1 flex items-center gap-1">
+                  <Filter className="w-3.5 h-3.5 text-indigo-600" /> Filter options:
+                </span>
+                {['All', 'In Progress', 'Completed', 'Recently Added'].map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setTabFilter(tab)}
+                    className={`px-3.5 py-1.5 rounded-xl text-xs transition ${
+                      tabFilter === tab
+                        ? 'bg-indigo-600 text-white font-bold shadow-md shadow-indigo-600/20'
+                        : 'bg-slate-100 text-slate-600 hover:text-slate-900 border border-slate-200 font-semibold'
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                ))}
+              </div>
+            )}
 
             {/* Kits Count Label */}
             <div className="text-xs font-bold text-slate-500 pt-1">

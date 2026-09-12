@@ -199,65 +199,63 @@ export default function ProfilePage() {
 
         <main className="p-4 sm:p-6 lg:p-8 max-w-5xl w-full mx-auto space-y-8">
           {/* User Avatar & Overview Card */}
-          <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="flex items-center space-x-6">
-              {/* Profile Avatar with '+' Upload Button */}
-              <div className="relative group">
-                {user?.profilePicture ? (
-                  <img
-                    src={user.profilePicture}
-                    alt="Profile Avatar"
-                    className="w-20 h-20 rounded-2xl object-cover border-2 border-indigo-500 shadow-md"
-                  />
-                ) : selectedAvatarObj ? (
-                  <div className={`w-20 h-20 rounded-2xl ${selectedAvatarObj.bg} text-white font-extrabold text-3xl flex items-center justify-center shadow-md`}>
-                    {selectedAvatarObj.icon}
-                  </div>
-                ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-indigo-600 text-white font-extrabold text-3xl flex items-center justify-center shadow-md shadow-indigo-600/30">
-                    {firstInitial}
-                  </div>
-                )}
-
-                {/* '+' Upload Button Overlay */}
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  title="Upload profile picture"
-                  className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center border-2 border-white shadow-md transition transform hover:scale-110"
-                >
-                  <Plus className="w-4 h-4 font-bold" />
-                </button>
-
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleImageSelect}
-                  accept="image/*"
-                  className="hidden"
+          <div className="bg-white rounded-3xl border border-slate-200 p-8 shadow-sm flex items-center justify-start gap-6">
+            {/* Profile Avatar with '+' Upload Button */}
+            <div className="relative group shrink-0">
+              {user?.profilePicture ? (
+                <img
+                  src={user.profilePicture}
+                  alt="Profile Avatar"
+                  className="w-20 h-20 rounded-2xl object-cover border-2 border-indigo-500 shadow-md"
                 />
-              </div>
-
-              <div>
-                <div className="flex items-center gap-3 mb-1">
-                  <h2 className="text-2xl font-extrabold text-slate-900">{displayName}</h2>
-                  
-                  <span className={`text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border ${subInfo.color}`}>
-                    {subInfo.badge} • {subInfo.label}
-                  </span>
+              ) : selectedAvatarObj ? (
+                <div className={`w-20 h-20 rounded-2xl ${selectedAvatarObj.bg} text-white font-extrabold text-3xl flex items-center justify-center shadow-md`}>
+                  {selectedAvatarObj.icon}
                 </div>
-                <p className="text-slate-500 text-xs flex items-center gap-1.5 font-medium">
-                  <Mail className="w-3.5 h-3.5 text-slate-400" />
-                  {user?.email}
-                </p>
-              </div>
+              ) : (
+                <div className="w-20 h-20 rounded-2xl bg-indigo-600 text-white font-extrabold text-3xl flex items-center justify-center shadow-md shadow-indigo-600/30">
+                  {firstInitial}
+                </div>
+              )}
+
+              {/* '+' Upload Button Overlay */}
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                title="Upload profile picture"
+                className="absolute -bottom-2 -right-2 w-8 h-8 rounded-full bg-indigo-600 hover:bg-indigo-700 text-white flex items-center justify-center border-2 border-white shadow-md transition transform hover:scale-110"
+              >
+                <Plus className="w-4 h-4 font-bold" />
+              </button>
+
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImageSelect}
+                accept="image/*"
+                className="hidden"
+              />
             </div>
 
-            <button
-              onClick={logout}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl border border-slate-200 text-xs font-bold transition flex items-center gap-2"
-            >
-              <LogOut className="w-4 h-4" /> Log out
-            </button>
+            {/* User Details Stack: Name, then Email below name, then Plan detail below email */}
+            <div className="space-y-1.5 min-w-0">
+              {/* 1. Name on single line (no break) */}
+              <h2 className="text-xl sm:text-2xl font-extrabold text-slate-900 whitespace-nowrap truncate">
+                {displayName}
+              </h2>
+
+              {/* 2. Mail ID below name */}
+              <p className="text-slate-500 text-xs flex items-center gap-1.5 font-medium truncate">
+                <Mail className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+                <span>{user?.email}</span>
+              </p>
+
+              {/* 3. Plan detail below mail ID */}
+              <div className="pt-0.5">
+                <span className={`inline-flex items-center text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider border ${subInfo.color}`}>
+                  {subInfo.badge} • {subInfo.label}
+                </span>
+              </div>
+            </div>
           </div>
 
           {profileMsg && (
