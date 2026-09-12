@@ -16,13 +16,14 @@ function cleanJsonResponse(rawText) {
 }
 
 /**
- * Calls Gemini API or returns structured fallback output if API key is not set.
+ * Calls Gemini API with 5s timeout guard or returns structured fallback output.
  */
-async function generateLlmJson(prompt, systemInstruction = '') {
+async function generateLlmJson(prompt, systemInstruction = '', timeoutMs = 5000) {
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (apiKey && apiKey.trim() !== '' && apiKey !== 'your_gemini_api_key_here') {
-    const modelsToTry = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-1.5-flash'];
+    // Use valid fast models only
+    const modelsToTry = ['gemini-2.0-flash', 'gemini-1.5-flash'];
     const genAI = new GoogleGenerativeAI(apiKey);
 
     for (const modelName of modelsToTry) {
@@ -38,20 +39,28 @@ async function generateLlmJson(prompt, systemInstruction = '') {
           ? `${systemInstruction}\n\nUSER PROMPT:\n${prompt}` 
           : prompt;
 
-        const result = await model.generateContent(fullPrompt);
+        // 5-second timeout race to ensure fast response
+        const timeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error(`LLM generation timeout (${timeoutMs}ms)`)), timeoutMs)
+        );
+
+        const generatePromise = model.generateContent(fullPrompt);
+        const result = await Promise.race([generatePromise, timeoutPromise]);
+        
         const text = result.response.text();
         const cleanedText = cleanJsonResponse(text);
         const parsed = JSON.parse(cleanedText);
         logger.info(`[LLM Service] AI content generated successfully using model '${modelName}'.`);
         return parsed;
       } catch (err) {
-        logger.warn(`[LLM Service] Model '${modelName}' attempt failed: ${err.message}. Trying next model...`);
+        logger.warn(`[LLM Service] Model '${modelName}' attempt notice: ${err.message}. Trying fallback...`);
       }
     }
   }
 
-  logger.info('[LLM Service] Operating in offline/rule-based fallback mode.');
+  logger.info('[LLM Service] Operating in fast offline/rule-based fallback mode.');
   return null; // Return null so callers can execute domain-specific fallback logic
 }
 
 module.exports = { generateLlmJson, cleanJsonResponse };
+

@@ -9,12 +9,15 @@ const logger = require('../utils/logger');
 // In-memory store fallback if DB offline
 const inMemoryKits = new Map();
 
-// Safe Mongoose query helper for string IDs vs ObjectIds
-function getKitQuery(id) {
-  if (id && mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id)) {
-    return { $or: [{ _id: id }, { id }] };
+// Safe Mongoose query helper for string IDs vs ObjectIds with optional userId isolation
+function getKitQuery(id, userId) {
+  const query = (id && mongoose.Types.ObjectId.isValid(id) && String(new mongoose.Types.ObjectId(id)) === String(id))
+    ? { $or: [{ _id: id }, { id }] }
+    : { id };
+  if (userId) {
+    query.userId = userId;
   }
-  return { id };
+  return query;
 }
 
 const { generateRegeneratedQuestions } = require('../services/question.service');
@@ -26,7 +29,7 @@ async function createKit(req, res) {
   }
 
   const { jobDescription, companyUrl, companyName, roleTitle, seniorityLevel, daysAvailable } = req.body;
-  const userId = req.user?.userId || 'demo_user';
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
 
   // Check user subscription & kit limit
   try {
@@ -82,7 +85,7 @@ async function createKit(req, res) {
   }
 
   // Trigger background AI pipeline
-  runPipelineInBackground(kitId, jobDescription, companyUrl, daysAvailable, companyName, roleTitle, seniorityLevel).catch(err => {
+  runPipelineInBackground(kitId, jobDescription, companyUrl, daysAvailable, companyName, roleTitle, seniorityLevel, userId).catch(err => {
     logger.error(`Background pipeline exception for kit ${kitId}: ${err.message}`);
   });
 
@@ -93,14 +96,14 @@ async function createKit(req, res) {
   });
 }
 
-async function runPipelineInBackground(kitId, jobDescription, companyUrl, daysAvailable, companyName, roleTitle, seniorityLevel) {
+async function runPipelineInBackground(kitId, jobDescription, companyUrl, daysAvailable, companyName, roleTitle, seniorityLevel, userId) {
   const updateStatus = async (status) => {
     try {
       if (Kit.db && Kit.db.readyState === 1) {
-        await Kit.updateOne(getKitQuery(kitId), { $set: { status, updatedAt: new Date() } });
+        await Kit.updateOne(getKitQuery(kitId, userId), { $set: { status, updatedAt: new Date() } });
       }
       const existing = inMemoryKits.get(kitId);
-      if (existing) {
+      if (existing && existing.userId === userId) {
         existing.status = status;
         existing.updatedAt = new Date();
       }
@@ -115,7 +118,7 @@ async function runPipelineInBackground(kitId, jobDescription, companyUrl, daysAv
 
     if (Kit.db && Kit.db.readyState === 1) {
       const updateRes = await Kit.updateOne(
-        getKitQuery(kitId),
+        getKitQuery(kitId, userId),
         {
           $set: {
             ...finalKitData,
@@ -133,6 +136,7 @@ async function runPipelineInBackground(kitId, jobDescription, companyUrl, daysAv
       ...finalKitData,
       id: kitId,
       _id: kitId,
+      userId,
       status: 'completed',
       updatedAt: new Date()
     });
@@ -140,7 +144,7 @@ async function runPipelineInBackground(kitId, jobDescription, companyUrl, daysAv
   } catch (err) {
     logger.error(`[Kit Controller] Pipeline failed for ${kitId}: ${err.message}`);
     if (Kit.db && Kit.db.readyState === 1) {
-      await Kit.updateOne(getKitQuery(kitId), { $set: { status: 'failed', errorMessage: err.message } });
+      await Kit.updateOne(getKitQuery(kitId, userId), { $set: { status: 'failed', errorMessage: err.message } });
     }
     const cached = inMemoryKits.get(kitId);
     if (cached) {
@@ -152,12 +156,16 @@ async function runPipelineInBackground(kitId, jobDescription, companyUrl, daysAv
 
 async function getKitStatus(req, res) {
   const { id } = req.params;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
   try {
     let kit = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      kit = await Kit.findOne(getKitQuery(id));
+      kit = await Kit.findOne(getKitQuery(id, userId));
     }
-    if (!kit) kit = inMemoryKits.get(id);
+    if (!kit) {
+      const cached = inMemoryKits.get(id);
+      if (cached && cached.userId === userId) kit = cached;
+    }
 
     if (!kit) return res.status(404).json({ error: 'Kit not found' });
 
@@ -195,12 +203,16 @@ function syncKitSchedule(kitObj) {
 
 async function getKit(req, res) {
   const { id } = req.params;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
   try {
     let kit = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      kit = await Kit.findOne(getKitQuery(id));
+      kit = await Kit.findOne(getKitQuery(id, userId));
     }
-    if (!kit) kit = inMemoryKits.get(id);
+    if (!kit) {
+      const cached = inMemoryKits.get(id);
+      if (cached && cached.userId === userId) kit = cached;
+    }
 
     if (!kit) return res.status(404).json({ error: 'Kit not found' });
 
@@ -213,13 +225,14 @@ async function getKit(req, res) {
 }
 
 async function listKits(req, res) {
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
   try {
     let kits = [];
     if (Kit.db && Kit.db.readyState === 1) {
-      kits = await Kit.find({}).sort({ createdAt: -1 }).limit(50);
+      kits = await Kit.find({ userId }).sort({ createdAt: -1 }).limit(50);
     }
     if (kits.length === 0 && inMemoryKits.size > 0) {
-      kits = Array.from(inMemoryKits.values());
+      kits = Array.from(inMemoryKits.values()).filter(k => k.userId === userId);
     }
     res.json(kits.map(k => {
       const obj = k.toObject ? k.toObject() : k;
@@ -233,17 +246,20 @@ async function listKits(req, res) {
 
 async function updateKit(req, res) {
   const { id } = req.params;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
   const updates = req.body;
 
   try {
     let kit = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      kit = await Kit.findOneAndUpdate(getKitQuery(id), { $set: updates }, { new: true });
+      kit = await Kit.findOneAndUpdate(getKitQuery(id, userId), { $set: updates }, { new: true });
     }
     if (!kit && inMemoryKits.has(id)) {
       const existing = inMemoryKits.get(id);
-      kit = { ...existing, ...updates, updatedAt: new Date() };
-      inMemoryKits.set(id, kit);
+      if (existing && existing.userId === userId) {
+        kit = { ...existing, ...updates, updatedAt: new Date() };
+        inMemoryKits.set(id, kit);
+      }
     }
 
     if (!kit) return res.status(404).json({ error: 'Kit not found' });
@@ -258,6 +274,7 @@ async function updateKit(req, res) {
 
 async function updateReadiness(req, res) {
   const { id } = req.params;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
   const { readiness } = req.body; // 'red' | 'yellow' | 'green'
 
   if (!['red', 'yellow', 'green'].includes(readiness)) {
@@ -267,11 +284,14 @@ async function updateReadiness(req, res) {
   try {
     let kit = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      kit = await Kit.findOneAndUpdate(getKitQuery(id), { $set: { readiness } }, { new: true });
+      kit = await Kit.findOneAndUpdate(getKitQuery(id, userId), { $set: { readiness } }, { new: true });
     }
     if (!kit && inMemoryKits.has(id)) {
-      kit = inMemoryKits.get(id);
-      kit.readiness = readiness;
+      const memKit = inMemoryKits.get(id);
+      if (memKit && memKit.userId === userId) {
+        memKit.readiness = readiness;
+        kit = memKit;
+      }
     }
 
     if (!kit) return res.status(404).json({ error: 'Kit not found' });
@@ -283,12 +303,13 @@ async function updateReadiness(req, res) {
 
 async function updateFlashcardLevel(req, res) {
   const { id } = req.params;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
   const { cardId, understandingLevel } = req.body; // 'beginner' | 'intermediate' | 'fully'
 
   try {
     let kit = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      kit = await Kit.findOne(getKitQuery(id));
+      kit = await Kit.findOne(getKitQuery(id, userId));
       if (kit) {
         kit.flashcards = kit.flashcards.map(fc => {
           if (fc.id === cardId) {
@@ -301,11 +322,16 @@ async function updateFlashcardLevel(req, res) {
     }
     if (inMemoryKits.has(id)) {
       const memKit = inMemoryKits.get(id);
-      memKit.flashcards = (memKit.flashcards || []).map(fc => {
-        if (fc.id === cardId) fc.understandingLevel = understandingLevel;
-        return fc;
-      });
+      if (memKit && memKit.userId === userId) {
+        memKit.flashcards = (memKit.flashcards || []).map(fc => {
+          if (fc.id === cardId) fc.understandingLevel = understandingLevel;
+          return fc;
+        });
+        kit = memKit;
+      }
     }
+
+    if (!kit) return res.status(404).json({ error: 'Kit not found' });
 
     res.json({ message: 'Flashcard understanding level updated', cardId, understandingLevel });
   } catch (err) {
@@ -317,13 +343,17 @@ const { generateSchedule } = require('../services/schedule.service');
 
 async function regenerateKitSection(req, res) {
   const { id } = req.params;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
 
   try {
     let kit = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      kit = await Kit.findOne(getKitQuery(id));
+      kit = await Kit.findOne(getKitQuery(id, userId));
     }
-    if (!kit) kit = inMemoryKits.get(id);
+    if (!kit) {
+      const cached = inMemoryKits.get(id);
+      if (cached && cached.userId === userId) kit = cached;
+    }
 
     if (!kit) return res.status(404).json({ error: 'Kit not found' });
 
@@ -362,12 +392,14 @@ async function regenerateKitSection(req, res) {
 
     let updatedKitObj = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      updatedKitObj = await Kit.findOneAndUpdate(getKitQuery(id), { $set: updates }, { new: true });
+      updatedKitObj = await Kit.findOneAndUpdate(getKitQuery(id, userId), { $set: updates }, { new: true });
     }
     if (!updatedKitObj && inMemoryKits.has(id)) {
       const existing = inMemoryKits.get(id);
-      updatedKitObj = { ...existing, ...updates };
-      inMemoryKits.set(id, updatedKitObj);
+      if (existing && existing.userId === userId) {
+        updatedKitObj = { ...existing, ...updates };
+        inMemoryKits.set(id, updatedKitObj);
+      }
     }
 
     const obj = updatedKitObj ? (updatedKitObj.toObject ? updatedKitObj.toObject() : updatedKitObj) : updates;
@@ -381,11 +413,15 @@ async function regenerateKitSection(req, res) {
 
 async function deleteKit(req, res) {
   const { id } = req.params;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
   try {
     if (Kit.db && Kit.db.readyState === 1) {
-      await Kit.deleteOne(getKitQuery(id));
+      await Kit.deleteOne(getKitQuery(id, userId));
     }
-    inMemoryKits.delete(id);
+    const memKit = inMemoryKits.get(id);
+    if (memKit && memKit.userId === userId) {
+      inMemoryKits.delete(id);
+    }
     res.json({ message: 'Kit deleted successfully', id });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -394,12 +430,16 @@ async function deleteKit(req, res) {
 
 async function duplicateKit(req, res) {
   const { id } = req.params;
+  const userId = req.user?.userId || req.user?.id || 'demo_user';
   try {
     let original = null;
     if (Kit.db && Kit.db.readyState === 1) {
-      original = await Kit.findOne(getKitQuery(id));
+      original = await Kit.findOne(getKitQuery(id, userId));
     }
-    if (!original) original = inMemoryKits.get(id);
+    if (!original) {
+      const cached = inMemoryKits.get(id);
+      if (cached && cached.userId === userId) original = cached;
+    }
 
     if (!original) return res.status(404).json({ error: 'Original kit not found' });
 
@@ -409,6 +449,7 @@ async function duplicateKit(req, res) {
 
     const newId = `kit_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
     obj.id = newId;
+    obj.userId = userId;
     obj.createdAt = new Date();
     obj.updatedAt = new Date();
 

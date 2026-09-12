@@ -1,7 +1,8 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
@@ -15,6 +16,7 @@ import AnalysisPage from './pages/AnalysisPage';
 import PlansPage from './pages/PlansPage';
 import ProfilePage from './pages/ProfilePage';
 import HelpSupportPage from './pages/HelpSupportPage';
+import NotFoundPage from './pages/NotFoundPage';
 
 export default function App() {
   return (
@@ -39,23 +41,29 @@ export default function App() {
       />
       <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/create" element={<CreateKitPage />} />
-          <Route path="/kits" element={<KitsListPage />} />
-          <Route path="/kits/:id" element={<KitDetailPage />} />
-          <Route path="/flashcards" element={<FlashcardsPage />} />
-          <Route path="/practice" element={<FlashcardsPage />} />
-          <Route path="/schedule" element={<SchedulePage />} />
-          <Route path="/analysis" element={<AnalysisPage />} />
-          <Route path="/plans" element={<PlansPage />} />
-          <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/help" element={<HelpSupportPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+
+          {/* Protected Routes */}
+          <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+          <Route path="/create" element={<ProtectedRoute><CreateKitPage /></ProtectedRoute>} />
+          <Route path="/kits" element={<ProtectedRoute><KitsListPage /></ProtectedRoute>} />
+          <Route path="/kits/:id" element={<ProtectedRoute><KitDetailPage /></ProtectedRoute>} />
+          <Route path="/flashcards" element={<ProtectedRoute><FlashcardsPage /></ProtectedRoute>} />
+          <Route path="/practice" element={<ProtectedRoute><FlashcardsPage /></ProtectedRoute>} />
+          <Route path="/schedule" element={<ProtectedRoute><SchedulePage /></ProtectedRoute>} />
+          <Route path="/analysis" element={<ProtectedRoute><AnalysisPage /></ProtectedRoute>} />
+          <Route path="/plans" element={<ProtectedRoute><PlansPage /></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute><ProfilePage /></ProtectedRoute>} />
+          <Route path="/help" element={<ProtectedRoute><HelpSupportPage /></ProtectedRoute>} />
+
+          {/* 404 Invalid URL Route */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
   );
 }
+

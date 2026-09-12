@@ -54,6 +54,11 @@ app.use('/api/kits', kitRoutes);
 app.use('/api/practice', practiceRoutes);
 app.use('/api/payments', paymentRoutes);
 
+// 404 Handler for Unhandled Routes
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: 'API endpoint not found (404)' });
+});
+
 // Error Middleware
 app.use(errorHandler);
 

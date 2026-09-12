@@ -65,6 +65,7 @@ export function AuthProvider({ children }) {
     } catch (e) {}
     localStorage.removeItem('token');
     setUser(null);
+    window.history.pushState(null, '', '/login');
     window.location.href = '/';
   };
 
@@ -82,3 +83,4 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+

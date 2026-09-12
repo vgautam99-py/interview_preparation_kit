@@ -8,6 +8,9 @@ const { validateRegister, validateLogin } = require('../validators/authValidator
 const JWT_SECRET = process.env.JWT_SECRET || '7f3c9a21e8b64d0f5a72c1e9b83d6a4f2c8e1d9a6b5f0c3e7a2d8f4b9c1e6a5';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'e8b64d0f5a72c1e9b83d6a4f2c8e1d9a6b5f0c3e7a2d8f4b9c1e6a57f3c9a21';
 
+// In-memory user fallback if DB offline
+const inMemoryUsers = new Map();
+
 // Helper to set HttpOnly cookies with 30-day expiration
 function setAuthCookies(res, accessToken, refreshToken) {
   res.cookie('access_token', accessToken, {
@@ -40,8 +43,7 @@ async function register(req, res) {
       await connectDB();
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(password, salt);
+    const passwordHash = await bcrypt.hash(password, 10);
 
     if (mongoose.connection.readyState === 1) {
       const existingUser = await User.findOne({ email });
@@ -68,9 +70,31 @@ async function register(req, res) {
       });
     }
 
+    // In-memory fallback
+    const existing = Array.from(inMemoryUsers.values()).find(u => u.email === email);
+    if (existing) return res.status(400).json({ error: 'Email already registered.' });
+
+    const userId = `user_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`;
+    const memUser = {
+      id: userId,
+      _id: userId,
+      name,
+      email,
+      passwordHash,
+      isVerified: false,
+      subscription: 'free',
+      profilePicture: '',
+      avatar: 'avatar1',
+      gender: 'unspecified',
+      dob: '',
+      paymentHistory: [],
+      createdAt: new Date()
+    };
+    inMemoryUsers.set(userId, memUser);
+
     return res.status(201).json({
       message: 'Registration successful! Please log in with your email and password.',
-      user: { id: `user_${Date.now()}`, name, email, isVerified: false }
+      user: { id: userId, name, email, isVerified: false }
     });
 
   } catch (err) {
@@ -127,9 +151,20 @@ async function login(req, res) {
       });
     }
 
-    // Fallback response for offline test execution
-    const accessToken = jwt.sign({ userId: 'demo_user', email, name: 'Candidate' }, JWT_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ userId: 'demo_user' }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
+    // Fallback response for offline test execution / in-memory store
+    const memUser = Array.from(inMemoryUsers.values()).find(u => u.email === email);
+    let userId = 'demo_user';
+    let name = 'Candidate';
+    if (memUser) {
+      const isMatch = await bcrypt.compare(password, memUser.passwordHash);
+      if (!isMatch) return res.status(400).json({ error: 'Invalid email or password.' });
+      userId = memUser.id;
+      name = memUser.name;
+      memUser.isVerified = true;
+    }
+
+    const accessToken = jwt.sign({ userId, email, name }, JWT_SECRET, { expiresIn: '15m' });
+    const refreshToken = jwt.sign({ userId }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
 
     setAuthCookies(res, accessToken, refreshToken);
 
@@ -138,16 +173,16 @@ async function login(req, res) {
       token: accessToken,
       refreshToken,
       user: {
-        id: 'demo_user',
-        name: 'Candidate',
+        id: userId,
+        name: memUser?.name || name,
         email,
         isVerified: true,
-        profilePicture: '',
-        avatar: 'avatar1',
-        gender: 'unspecified',
-        dob: '',
-        subscription: 'free',
-        paymentHistory: []
+        profilePicture: memUser?.profilePicture || '',
+        avatar: memUser?.avatar || 'avatar1',
+        gender: memUser?.gender || 'unspecified',
+        dob: memUser?.dob || '',
+        subscription: memUser?.subscription || 'free',
+        paymentHistory: memUser?.paymentHistory || []
       }
     });
 
@@ -223,6 +258,21 @@ async function getMe(req, res) {
       }
     }
     
+    // In-memory lookup
+    if (inMemoryUsers.has(userId)) {
+      const memUser = { ...inMemoryUsers.get(userId) };
+      delete memUser.passwordHash;
+      delete memUser.refreshToken;
+      return res.json({ user: memUser });
+    }
+    const memUserByEmail = Array.from(inMemoryUsers.values()).find(u => u.email === req.user?.email);
+    if (memUserByEmail) {
+      const memUser = { ...memUserByEmail };
+      delete memUser.passwordHash;
+      delete memUser.refreshToken;
+      return res.json({ user: memUser });
+    }
+
     return res.json({
       user: {
         id: req.user?.userId || 'demo_user',
@@ -277,6 +327,17 @@ async function updateProfile(req, res) {
       return res.json({ message: 'Profile updated successfully', user });
     }
 
+    if (inMemoryUsers.has(userId)) {
+      const memUser = inMemoryUsers.get(userId);
+      if (name) memUser.name = name;
+      if (email) memUser.email = email;
+      if (gender) memUser.gender = gender;
+      if (dob !== undefined) memUser.dob = dob;
+      if (avatar) memUser.avatar = avatar;
+      if (profilePicture !== undefined) memUser.profilePicture = profilePicture;
+      if (subscription) memUser.subscription = subscription.toLowerCase();
+    }
+
     return res.json({ message: 'Profile updated successfully' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
@@ -306,11 +367,19 @@ async function changePassword(req, res) {
         if (!isMatch) return res.status(400).json({ error: 'Current password is incorrect.' });
       }
 
-      const salt = await bcrypt.genSalt(10);
-      user.passwordHash = await bcrypt.hash(newPassword, salt);
+      user.passwordHash = await bcrypt.hash(newPassword, 10);
       await user.save();
 
       return res.json({ message: 'Password changed successfully.' });
+    }
+
+    if (inMemoryUsers.has(userId)) {
+      const memUser = inMemoryUsers.get(userId);
+      if (currentPassword) {
+        const isMatch = await bcrypt.compare(currentPassword, memUser.passwordHash);
+        if (!isMatch) return res.status(400).json({ error: 'Current password is incorrect.' });
+      }
+      memUser.passwordHash = await bcrypt.hash(newPassword, 10);
     }
 
     return res.json({ message: 'Password changed successfully.' });

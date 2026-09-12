@@ -1,38 +1,45 @@
 const mongoose = require('mongoose');
-const dns = require('dns');
 
-// Fix Windows Node.js DNS SRV resolution for mongodb+srv:// Atlas connection
-try {
-  dns.setServers(['8.8.8.8', '1.1.1.1']);
-} catch (e) {}
-
-let isConnecting = false;
+let connectPromise = null;
+let lastFailTime = 0;
+const FAIL_COOLDOWN_MS = 15000; // 15s cooldown if DB connection fails
 
 const connectDB = async () => {
   if (mongoose.connection.readyState === 1) {
     return mongoose.connection;
   }
 
-  if (isConnecting) {
-    return;
+  // If a connection attempt failed recently, don't hang requests with repetitive timeouts
+  if (Date.now() - lastFailTime < FAIL_COOLDOWN_MS) {
+    return null;
   }
 
-  isConnecting = true;
-  try {
-    const connStr = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/interviewkit';
-    
-    const conn = await mongoose.connect(connStr, {
-      serverSelectionTimeoutMS: 5000,
-      socketTimeoutMS: 45000,
-    });
-    
-    console.log(`[MongoDB Atlas] Connected successfully: ${conn.connection.host}`);
-    isConnecting = false;
-    return conn;
-  } catch (error) {
-    isConnecting = false;
-    console.warn(`[MongoDB Atlas] Connection warning: ${error.message}. Running in fallback mode.`);
+  if (connectPromise) {
+    return connectPromise;
   }
+
+  connectPromise = (async () => {
+    try {
+      const connStr = process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/interviewkit';
+      
+      const conn = await mongoose.connect(connStr, {
+        serverSelectionTimeoutMS: 3000,
+        socketTimeoutMS: 45000,
+      });
+      
+      console.log(`[MongoDB] Connected successfully: ${conn.connection.host}`);
+      connectPromise = null;
+      return conn;
+    } catch (error) {
+      connectPromise = null;
+      lastFailTime = Date.now();
+      console.warn(`[MongoDB] Connection warning: ${error.message}. Running in fast fallback mode.`);
+      return null;
+    }
+  })();
+
+  return connectPromise;
 };
 
 module.exports = connectDB;
+

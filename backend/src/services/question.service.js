@@ -336,14 +336,30 @@ async function generateRegeneratedQuestions(kit, count = 5) {
   const existingCount = kit.questions ? kit.questions.length : 0;
 
   const systemInstruction = `
-You are an expert technical interviewer. Generate EXACTLY ${count} brand new, unique, highly relevant interview questions and detailed answers for a ${seniority} ${role} candidate at ${company}.
-Answers must be comprehensive, step-by-step explanations.
+You are an expert technical interviewer. Generate EXACTLY ${count} brand new interview questions and corresponding flashcards for a ${seniority} ${role} candidate at ${company}.
+Return JSON only:
+{
+  "questions": [
+    {
+      "category": "Technical",
+      "prompt": "Question prompt?",
+      "answer_outline": "Detailed step-by-step answer outline.",
+      "difficulty": 2
+    }
+  ],
+  "flashcards": [
+    {
+      "front": "Flashcard front concept?",
+      "back": "Concise explanation."
+    }
+  ]
+}
 `;
 
-  const prompt = `COMPANY: ${company}, ROLE: ${role}, SENIORITY: ${seniority}. Generate 5 brand new questions & answers and corresponding flashcards.`;
+  const prompt = `COMPANY: ${company}, ROLE: ${role}, SENIORITY: ${seniority}. Generate ${count} new interview questions and flashcards.`;
 
   try {
-    const res = await generateLlmJson(prompt, systemInstruction);
+    const res = await generateLlmJson(prompt, systemInstruction, 3500);
     if (res && res.questions && Array.isArray(res.questions)) {
       const newQs = res.questions.slice(0, count).map((q, idx) => ({
         id: `Q-${existingCount + idx + 1}`,
@@ -368,7 +384,7 @@ Answers must be comprehensive, step-by-step explanations.
       return { questions: newQs, flashcards: newFcs };
     }
   } catch (e) {
-    logger.warn(`[Regeneration] LLM call failed: ${e.message}. Using fallback generated questions.`);
+    logger.warn(`[Regeneration] LLM call notice: ${e.message}. Using fast fallback generated questions.`);
   }
 
   // Fallback 5 new questions

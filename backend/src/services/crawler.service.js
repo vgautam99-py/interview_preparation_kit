@@ -33,11 +33,11 @@ async function crawlCompanyWebsite(companyUrl) {
   try {
     logger.info(`[Crawler] Fetching main page: ${targetUrl}`);
     const response = await axios.get(targetUrl, {
-      timeout: 6000,
+      timeout: 3000,
       headers: {
         'User-Agent': 'AI-Interview-PrepKit-Crawler/1.0 (+https://interviewkit.local)'
       },
-      maxContentLength: 2 * 1024 * 1024 // 2MB max
+      maxContentLength: 1.5 * 1024 * 1024 // 1.5MB max
     });
 
     if (typeof response.data !== 'string') {
@@ -50,7 +50,7 @@ async function crawlCompanyWebsite(companyUrl) {
     $('script, style, noscript, nav, footer, svg, iframe, header').remove();
     
     // Extract main text content
-    const mainText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 4000);
+    const mainText = $('body').text().replace(/\s+/g, ' ').trim().slice(0, 3000);
     
     if (mainText.length > 50) {
       pagesContent.push({ url: targetUrl, text: mainText });
@@ -73,31 +73,37 @@ async function crawlCompanyWebsite(companyUrl) {
       }
     });
 
-    // Crawl subpages up to limit 2
-    for (const subUrl of discoveredLinks) {
-      try {
+    // Crawl subpages concurrently with 2s timeout
+    if (discoveredLinks.length > 0) {
+      const subpageTasks = discoveredLinks.map(async (subUrl) => {
         const subCheck = validateUrl(subUrl, true);
-        if (!subCheck.valid) continue;
-        
-        logger.info(`[Crawler] Fetching discovered page: ${subUrl}`);
+        if (!subCheck.valid) return null;
+
+        logger.info(`[Crawler] Fetching discovered page concurrently: ${subUrl}`);
         const subRes = await axios.get(subUrl, {
-          timeout: 4000,
+          timeout: 2000,
           headers: { 'User-Agent': 'AI-Interview-PrepKit-Crawler/1.0' },
           maxContentLength: 1 * 1024 * 1024
         });
-        
+
         if (typeof subRes.data === 'string') {
           const $sub = cheerio.load(subRes.data);
           $sub('script, style, noscript, nav, footer, svg, iframe').remove();
-          const subText = $sub('body').text().replace(/\s+/g, ' ').trim().slice(0, 3000);
+          const subText = $sub('body').text().replace(/\s+/g, ' ').trim().slice(0, 2000);
           if (subText.length > 50) {
-            pagesContent.push({ url: subUrl, text: subText });
-            pagesUsed.push(subUrl);
+            return { url: subUrl, text: subText };
           }
         }
-      } catch (subErr) {
-        logger.warn(`[Crawler] Subpage crawl error on ${subUrl}: ${subErr.message}`);
-      }
+        return null;
+      });
+
+      const results = await Promise.allSettled(subpageTasks);
+      results.forEach(res => {
+        if (res.status === 'fulfilled' && res.value) {
+          pagesContent.push(res.value);
+          pagesUsed.push(res.value.url);
+        }
+      });
     }
 
     return {
