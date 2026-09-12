@@ -20,7 +20,11 @@ app.use(cors({
 app.use(express.json({ limit: '5mb' }));
 app.use(cookieParser());
 
-// Health Check
+// Root & Health Check
+app.get('/', (req, res) => {
+  res.json({ message: 'ViperAI API Server is running successfully!', status: 'ok' });
+});
+
 app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date() });
 });

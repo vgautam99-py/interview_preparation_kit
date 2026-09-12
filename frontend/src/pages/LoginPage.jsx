@@ -25,7 +25,8 @@ export default function LoginPage() {
       toast.success('Login successful! Welcome back.');
       navigate('/dashboard');
     } catch (err) {
-      const errMsg = err.response?.data?.error || 'Login failed. Invalid email or password.';
+      const rawErr = err.response?.data?.error || err.response?.data?.message || err.message;
+      const errMsg = typeof rawErr === 'string' ? rawErr : (typeof rawErr === 'object' ? (rawErr.message || JSON.stringify(rawErr)) : 'Login failed. Invalid email or password.');
       setError(errMsg);
       toast.error(errMsg);
     } finally {

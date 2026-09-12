@@ -23,7 +23,8 @@ export default function RegisterPage() {
       toast.success('Registration successful! Please log in with your credentials.');
       navigate('/login', { state: { message: 'Registration successful! Please log in with your credentials.' } });
     } catch (err) {
-      const errMsg = err.response?.data?.error || 'Registration failed.';
+      const rawErr = err.response?.data?.error || err.response?.data?.message || err.message;
+      const errMsg = typeof rawErr === 'string' ? rawErr : (typeof rawErr === 'object' ? (rawErr.message || JSON.stringify(rawErr)) : 'Registration failed.');
       setError(errMsg);
       toast.error(errMsg);
     } finally {
