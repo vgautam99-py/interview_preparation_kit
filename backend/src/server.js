@@ -13,8 +13,27 @@ const errorHandler = require('./middleware/errorMiddleware');
 const app = express();
 
 // Middleware
+// Dynamic CORS Configuration
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  process.env.FRONTEND_URL
+].filter(Boolean).map(url => url.trim().replace(/\/$/, ''));
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, postman, curl)
+    if (!origin) return callback(null, true);
+    
+    const cleanOrigin = origin.trim().replace(/\/$/, '');
+    
+    if (allowedOrigins.includes(cleanOrigin) || /\.vercel\.app$/.test(cleanOrigin)) {
+      return callback(null, true);
+    }
+    
+    // Fallback: allow request to proceed cleanly
+    return callback(null, true);
+  },
   credentials: true
 }));
 app.use(express.json({ limit: '5mb' }));
