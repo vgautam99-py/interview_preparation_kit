@@ -323,37 +323,37 @@ export default function LandingPage() {
       )}
 
       {/* Hero Section (Matching Image 1 Typography, Background Grid & Accent Line) */}
-      <section className="py-10 sm:py-20 lg:py-24 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-6 sm:space-y-8 relative w-full overflow-hidden box-border bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:2rem_2rem]">
-        <div className="text-center space-y-4 sm:space-y-6">
-          <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-xs font-bold px-4 py-2 rounded-full border border-indigo-200 shadow-sm max-w-[92vw] mx-auto text-center whitespace-normal leading-tight">
+      <section className="py-12 sm:py-24 lg:py-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto relative w-full overflow-hidden box-border bg-[linear-gradient(to_right,#f1f5f9_1px,transparent_1px),linear-gradient(to_bottom,#f1f5f9_1px,transparent_1px)] bg-[size:2rem_2rem]">
+        <div className="text-center space-y-6 sm:space-y-9">
+          <div className="inline-flex items-center gap-2 bg-indigo-50 text-indigo-700 text-xs font-bold px-4 py-2 rounded-full border border-indigo-200 shadow-sm max-w-[92vw] mx-auto text-center whitespace-normal leading-relaxed">
             <Sparkles className="w-4 h-4 text-indigo-600 flex-shrink-0" />
             <span>AI Prep Kits for Any Industry, Role, or Job</span>
           </div>
 
-          {/* Headline Matching Image 1: Bold Dark Top Title + Vibrant Blue Accent Title */}
-          <div className="max-w-4xl mx-auto space-y-2">
-            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
+          {/* Headline: Generous line-height and vertical spacing between lines */}
+          <div className="max-w-4xl mx-auto space-y-4 sm:space-y-5">
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-snug sm:leading-tight">
               Ace Any Job Interview with
             </h1>
-            <div className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-indigo-600 tracking-tight leading-tight">
+            <div className="text-3xl sm:text-5xl md:text-6xl font-extrabold text-indigo-600 tracking-tight leading-snug sm:leading-tight pt-1">
               ViperAI Prep Kits
             </div>
-            <div className="text-xl sm:text-3xl md:text-4xl font-extrabold text-sky-600 tracking-tight pt-1">
+            <div className="text-xl sm:text-3xl md:text-4xl font-extrabold text-sky-600 tracking-tight leading-snug sm:leading-normal pt-2">
               Structured AI Questions & Schedules
             </div>
 
-            {/* Horizontal Blue Gradient Accent Bar Underneath Title (Matching Image 1 Divider Line) */}
-            <div className="w-full max-w-2xl h-1.5 bg-gradient-to-r from-indigo-600 via-sky-500 to-indigo-800 rounded-full mx-auto my-4 sm:my-6 shadow-sm" />
+            {/* Horizontal Blue Gradient Accent Bar Underneath Title */}
+            <div className="w-full max-w-2xl h-1.5 bg-gradient-to-r from-indigo-600 via-sky-500 to-indigo-800 rounded-full mx-auto my-6 sm:my-8 shadow-sm" />
           </div>
 
-          <p className="text-slate-600 text-xs sm:text-base md:text-lg max-w-2xl mx-auto leading-relaxed px-2">
+          <p className="text-slate-600 text-sm sm:text-lg max-w-2xl mx-auto leading-loose sm:leading-relaxed px-4 py-2">
             Whether you are in Tech, Healthcare, Finance, Marketing, Sales, Education, Legal, or Management — turn any Job Description into structured questions, flashcards, and prep schedules.
           </p>
 
-          <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-6 pt-4 max-w-xs sm:max-w-none mx-auto">
+          <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 pt-6 max-w-xs sm:max-w-none mx-auto">
             <Link
               to={user ? "/create" : "/register"}
-              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-8 py-4 rounded-2xl shadow-xl shadow-indigo-600/20 flex items-center justify-center gap-2 text-xs sm:text-sm transition transform hover:scale-[1.02]"
+              className="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-9 py-4 rounded-2xl shadow-xl shadow-indigo-600/20 flex items-center justify-center gap-2.5 text-xs sm:text-sm transition transform hover:scale-[1.02]"
             >
               <span>Create Your Prep Kit Free</span>
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
