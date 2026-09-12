@@ -166,7 +166,7 @@ function processLlmKitResponse(raw, companyUrl, jobDescription, researchData, co
       flashcards.push({
         id: `FC-${qNum}`,
         requirement_ids: [`REQ-${(i % (requirements.length || 1)) + 1}`],
-        front: `Q${qNum} (${finalSeniority}): What is the primary architecture pattern for ${finalRoleTitle}?`,
+        front: `What is the primary architecture pattern for ${finalRoleTitle}?`,
         back: `Decoupled microservices architecture with cached data access layers and asynchronous message queues for ${finalCompanyName}.`,
         confidence: 0,
         state: 'generated'
@@ -287,7 +287,7 @@ function generateFallbackKitData(jobDescription, companyUrl, researchData, compa
     flashcards.push({
       id: `FC-${i + 1}`,
       requirement_ids: [`REQ-${(i % 5) + 1}`],
-      front: `Q${i + 1} (${finalSeniority}): ${fcTmpl.front}`,
+      front: fcTmpl.front,
       back: fcTmpl.back,
       confidence: 0,
       state: 'generated'

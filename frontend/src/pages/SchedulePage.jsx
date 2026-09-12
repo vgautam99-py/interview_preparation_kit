@@ -446,7 +446,7 @@ export default function SchedulePage() {
               </div>
 
               {/* SECTION 4: COMPLETE MULTI-DAY OVERVIEW TIMELINE */}
-              <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
+              <div className="hidden sm:block bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
                 <h3 className="text-base font-extrabold text-slate-900 uppercase tracking-wider">
                   Your {daysAvailable}-Day Plan Overview
                 </h3>

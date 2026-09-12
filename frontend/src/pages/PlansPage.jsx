@@ -84,7 +84,7 @@ export default function PlansPage() {
           )}
 
           {/* 4 Subscription Plans Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {plansData.map((plan) => {
               const isActive = currentPlan === plan.id || (plan.id === 'ultra pro' && (currentPlan === 'ultra' || currentPlan === 'ultra pro'));
               const amountVal = Number(plan.price.replace('₹', ''));
@@ -92,7 +92,7 @@ export default function PlansPage() {
               return (
                 <div
                   key={plan.id}
-                  className={`bg-white rounded-3xl p-6 border space-y-6 flex flex-col justify-between relative shadow-sm transition hover:shadow-md ${plan.borderStyle}`}
+                  className={`bg-white rounded-3xl p-4 sm:p-5 border space-y-6 flex flex-col justify-between relative shadow-sm transition hover:shadow-md ${plan.borderStyle}`}
                 >
                   {/* Badge */}
                   <div className="flex items-center justify-between">
@@ -132,24 +132,24 @@ export default function PlansPage() {
                   {/* Actions */}
                   <div className="space-y-2 pt-4 border-t border-slate-100">
                     {isActive ? (
-                      <div className="w-full bg-emerald-50 text-emerald-700 font-bold py-3 rounded-xl text-xs text-center border border-emerald-200 flex items-center justify-center gap-1.5">
+                      <div className="w-full bg-emerald-50 text-emerald-700 font-bold py-3.5 rounded-2xl text-xs sm:text-sm text-center border border-emerald-200 flex items-center justify-center gap-1.5 shadow-xs">
                         <Check className="w-4 h-4 font-bold" /> Active Current Plan
                       </div>
                     ) : amountVal > 0 ? (
                       <div className="space-y-2">
                         <button
                           onClick={() => handleRazorpayUpgrade(plan.id, plan.name, amountVal)}
-                          className={`w-full font-extrabold py-3 rounded-xl transition text-xs flex items-center justify-center gap-2 shadow-md ${plan.buttonColor}`}
+                          className={`w-full font-extrabold px-3 py-3.5 rounded-2xl transition text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md ${plan.buttonColor}`}
                         >
-                          <CreditCard className="w-4 h-4" />
-                          <span>Pay {plan.price} via Razorpay</span>
-                          <ArrowRight className="w-3.5 h-3.5" />
+                          <CreditCard className="w-4 h-4 shrink-0" />
+                          <span className="whitespace-nowrap">Pay {plan.price} via Razorpay</span>
+                          <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                         </button>
 
                         <button
                           onClick={() => handleSelectPlanDirect(plan.id, plan.name)}
                           disabled={loadingPlan === plan.id}
-                          className="w-full text-slate-500 hover:text-slate-800 font-bold py-1 text-[11px] transition text-center"
+                          className="w-full text-slate-500 hover:text-slate-800 font-bold py-1.5 text-[11px] transition text-center"
                         >
                           {loadingPlan === plan.id ? 'Switching...' : `Instant Demo Switch →`}
                         </button>
@@ -158,10 +158,10 @@ export default function PlansPage() {
                       <button
                         onClick={() => handleSelectPlanDirect(plan.id, plan.name)}
                         disabled={loadingPlan === plan.id}
-                        className={`w-full font-bold py-3 rounded-xl transition text-xs flex items-center justify-center gap-1.5 ${plan.buttonColor}`}
+                        className={`w-full font-extrabold px-3 py-3.5 rounded-2xl transition text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md ${plan.buttonColor}`}
                       >
                         {loadingPlan === plan.id ? 'Switching...' : `Select ${plan.name}`}
-                        <ArrowRight className="w-3.5 h-3.5" />
+                        <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                       </button>
                     )}
                   </div>

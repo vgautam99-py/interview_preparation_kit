@@ -112,6 +112,11 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
 
   const currentCard = cards[currentIndex];
 
+  const cleanFrontText = (text) => {
+    if (!text) return '';
+    return text.replace(/^(Q\d+\s*\([^)]+\):\s*)+/gi, '').trim();
+  };
+
   const CONFIDENCE_OPTIONS = [
     {
       level: 1,
@@ -250,7 +255,7 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
             {!isRevealed ? (
               <div className="flex-1 flex flex-col items-center justify-center space-y-8 py-6">
                 <h3 className="text-lg md:text-xl font-extrabold text-slate-900 leading-relaxed text-center max-w-xl">
-                  Q{currentIndex + 1} ({seniority}): {currentCard?.front || 'Question prompt'}
+                  Q{currentIndex + 1} ({seniority}): {cleanFrontText(currentCard?.front) || 'Question prompt'}
                 </h3>
 
                 <button
@@ -268,7 +273,7 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
                     Question
                   </span>
                   <p className="text-base md:text-lg font-extrabold text-slate-900 leading-relaxed">
-                    Q{currentIndex + 1} ({seniority}): {currentCard?.front}
+                    Q{currentIndex + 1} ({seniority}): {cleanFrontText(currentCard?.front)}
                   </p>
                 </div>
 
@@ -329,7 +334,7 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
                       isSelected ? opt.active : opt.color
                     }`}
                   >
-                    <span className="text-lg sm:text-xl">{opt.emoji}</span>
+                    <span className="hidden sm:block text-lg sm:text-xl">{opt.emoji}</span>
                     <span className="text-xs font-black">{opt.num}</span>
                     <span className="text-[10px] font-bold tracking-tight text-center leading-tight">
                       {opt.label}
