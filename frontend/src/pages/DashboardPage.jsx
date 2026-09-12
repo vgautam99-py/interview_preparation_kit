@@ -55,7 +55,7 @@ export default function DashboardPage() {
   const greetingTime = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
   const displayName = (user?.name && user.name !== 'Candidate')
     ? user.name.trim().split(' ')[0]
-    : (user?.email ? user.email.split('@')[0] : 'Vikash');
+    : (user?.email ? user.email.split('@')[0] : 'User');
 
   // Compute stats dynamically from MongoDB kits
   const kitsCount = kits.length;

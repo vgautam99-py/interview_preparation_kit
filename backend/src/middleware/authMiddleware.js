@@ -10,12 +10,6 @@ const authMiddleware = (req, res, next) => {
   }
 
   if (!token) {
-    // If no token, check demo mode in development
-    const allowDemo = process.env.ALLOW_ANONYMOUS_DEMO === 'true';
-    if (allowDemo) {
-      req.user = { userId: 'demo_user_id', email: 'demo@example.com', name: 'Demo Candidate' };
-      return next();
-    }
     return res.status(401).json({ error: 'Unauthorized. Authentication token required.' });
   }
 

@@ -152,40 +152,7 @@ async function login(req, res) {
       });
     }
 
-    // Fallback response for offline test execution / in-memory store
-    const memUser = Array.from(inMemoryUsers.values()).find(u => u.email === email);
-    let userId = 'demo_user';
-    let name = 'Candidate';
-    if (memUser) {
-      const isMatch = await bcrypt.compare(password, memUser.passwordHash);
-      if (!isMatch) return res.status(400).json({ error: 'Invalid email or password.' });
-      userId = memUser.id;
-      name = memUser.name;
-      memUser.isVerified = true;
-    }
-
-    const accessToken = jwt.sign({ userId, email, name }, JWT_SECRET, { expiresIn: '15m' });
-    const refreshToken = jwt.sign({ userId }, JWT_REFRESH_SECRET, { expiresIn: '7d' });
-
-    setAuthCookies(res, accessToken, refreshToken);
-
-    return res.json({
-      message: 'Login successful',
-      token: accessToken,
-      refreshToken,
-      user: {
-        id: userId,
-        name: memUser?.name || name,
-        email,
-        isVerified: true,
-        profilePicture: memUser?.profilePicture || '',
-        avatar: memUser?.avatar || 'avatar1',
-        gender: memUser?.gender || 'unspecified',
-        dob: memUser?.dob || '',
-        subscription: memUser?.subscription || 'free',
-        paymentHistory: memUser?.paymentHistory || []
-      }
-    });
+    return res.status(503).json({ error: 'Database service unavailable. Please ensure MongoDB is running.' });
 
   } catch (err) {
     res.status(500).json({ error: 'Login error: ' + err.message });
@@ -217,9 +184,7 @@ async function refreshToken(req, res) {
       }
     }
 
-    const newAccessToken = jwt.sign({ userId: decoded.userId, email: 'candidate@interviewkit.ai' }, JWT_SECRET, { expiresIn: '15m' });
-    setAuthCookies(res, newAccessToken, token);
-    return res.json({ token: newAccessToken, refreshToken: token });
+    return res.status(401).json({ error: 'Invalid or expired session. Please log in again.' });
 
   } catch (err) {
     return res.status(403).json({ error: 'Expired or invalid refresh token.' });
@@ -259,35 +224,7 @@ async function getMe(req, res) {
       }
     }
     
-    // In-memory lookup
-    if (inMemoryUsers.has(userId)) {
-      const memUser = { ...inMemoryUsers.get(userId) };
-      delete memUser.passwordHash;
-      delete memUser.refreshToken;
-      return res.json({ user: memUser });
-    }
-    const memUserByEmail = Array.from(inMemoryUsers.values()).find(u => u.email === req.user?.email);
-    if (memUserByEmail) {
-      const memUser = { ...memUserByEmail };
-      delete memUser.passwordHash;
-      delete memUser.refreshToken;
-      return res.json({ user: memUser });
-    }
-
-    return res.json({
-      user: {
-        id: req.user?.userId || 'demo_user',
-        name: req.user?.name || (req.user?.email ? req.user.email.split('@')[0] : 'User'),
-        email: req.user?.email || 'user@example.com',
-        isVerified: true,
-        profilePicture: '',
-        avatar: 'hero_boy',
-        gender: 'unspecified',
-        dob: '',
-        subscription: 'free',
-        paymentHistory: []
-      }
-    });
+    return res.status(404).json({ error: 'User profile not found in database.' });
   } catch (err) {
     return res.status(500).json({ error: err.message });
   }

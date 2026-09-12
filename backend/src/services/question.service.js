@@ -136,43 +136,21 @@ function processLlmKitResponse(raw, companyUrl, jobDescription, researchData, co
     state: 'generated'
   }));
 
-  // 3. Format Flashcards
-  let flashcards = (raw.flashcards || []).map((fc, idx) => ({
-    id: `FC-${idx + 1}`,
-    requirement_ids: resolveReqIds(fc.temp_req_text, idx),
-    front: fc.front,
-    back: fc.back,
-    confidence: 0,
-    state: 'generated'
-  }));
+  // 3. Format Flashcards - Guarantee 1-to-1 matching with interview questions
+  let flashcards = questions.map((q, idx) => {
+    const rawFc = raw.flashcards && raw.flashcards[idx];
+    const frontText = (rawFc && rawFc.front) ? rawFc.front : `Key Concept Q${idx + 1}: ${q.prompt.replace(/^\[.*?\]\s*/, '')}`;
+    const backText = (rawFc && rawFc.back) ? rawFc.back : (q.answer_outline ? q.answer_outline.split('\n').slice(0, 3).join('\n') : 'Key takeaway point.');
 
-  // Pad Questions and Flashcards up to targetTotalCount (e.g. 50 questions & flashcards for 5 days)
-  if (questions.length < targetTotalCount) {
-    const categories = ['System Design', 'Technical', 'Behavioral', 'Database Architecture', 'Security & Performance'];
-    const currentLen = questions.length;
-    for (let i = currentLen; i < targetTotalCount; i++) {
-      const qNum = i + 1;
-      questions.push({
-        id: `Q-${qNum}`,
-        requirement_ids: [`REQ-${(i % (requirements.length || 1)) + 1}`],
-        category: categories[i % categories.length],
-        prompt: `[${finalSeniority} Level] Q${qNum}: How do you design and optimize scalable ${finalRoleTitle} architecture at ${finalCompanyName}?`,
-        answer_outline: `1. Key architectural trade-off analysis\n2. Database query optimization and index design\n3. High-availability fault tolerance & error handling\n4. Performance monitoring & operational metrics`,
-        difficulty: (i % 3) + 1,
-        completed: false,
-        state: 'generated'
-      });
-
-      flashcards.push({
-        id: `FC-${qNum}`,
-        requirement_ids: [`REQ-${(i % (requirements.length || 1)) + 1}`],
-        front: `What is the primary architecture pattern for ${finalRoleTitle}?`,
-        back: `Decoupled microservices architecture with cached data access layers and asynchronous message queues for ${finalCompanyName}.`,
-        confidence: 0,
-        state: 'generated'
-      });
-    }
-  }
+    return {
+      id: `FC-${idx + 1}`,
+      requirement_ids: q.requirement_ids || [`REQ-${(idx % (requirements.length || 1)) + 1}`],
+      front: frontText,
+      back: backText,
+      confidence: 0,
+      state: 'generated'
+    };
+  });
 
   return {
     source: {
