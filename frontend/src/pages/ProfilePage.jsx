@@ -493,36 +493,37 @@ export default function ProfilePage() {
 
           {/* Razorpay Payment Transactions History */}
           <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm space-y-4">
-            <div className="border-b border-slate-100 pb-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="border-b border-slate-100 pb-3 flex items-center justify-between gap-3">
               <h3 className="text-sm font-bold text-slate-900 flex items-center gap-2">
-                <CreditCard className="w-4 h-4 text-indigo-600" />
-                <span>Razorpay Transaction History</span>
+                <CreditCard className="w-4 h-4 text-indigo-600 shrink-0" />
+                <span className="truncate">Payment History</span>
               </h3>
 
-              <div className="flex items-center gap-2">
-                {/* Filter Button */}
-                <div className="relative z-20">
+              <div className="flex items-center gap-2 shrink-0">
+                {/* Filter Button on Right Side */}
+                <div className="relative z-30">
                   <button
                     type="button"
                     onClick={() => setShowPaymentFilterDropdown(!showPaymentFilterDropdown)}
-                    className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 shadow-xs ${
+                    className={`p-2 sm:px-3 sm:py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1.5 shadow-xs ${
                       paymentFilter !== 'ALL'
                         ? 'bg-indigo-600 text-white border-indigo-600 shadow-indigo-600/20'
                         : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
+                    title="Filter payment options"
                   >
-                    <Filter className="w-3.5 h-3.5" />
-                    <span>Filter</span>
+                    <Filter className="w-4 h-4" />
+                    <span className="hidden sm:inline">Filter</span>
                     {paymentFilter !== 'ALL' && (
                       <span className="bg-white text-indigo-700 text-[10px] px-1.5 py-0.2 rounded-full font-black">
-                        {paymentFilter === 'THIS_MONTH' ? 'This Month' : paymentFilter === 'LAST_MONTH' ? 'Last Month' : paymentFilter === 'LAST_30_DAYS' ? '30 Days' : '90 Days'}
+                        {paymentFilter === 'THIS_MONTH' ? 'Month' : paymentFilter === 'LAST_MONTH' ? 'Last' : paymentFilter === 'LAST_30_DAYS' ? '30d' : '90d'}
                       </span>
                     )}
                   </button>
 
-                  {/* Filter Dropdown Menu */}
+                  {/* Filter Dropdown Menu Options Table */}
                   {showPaymentFilterDropdown && (
-                    <div className="absolute right-0 mt-2 w-48 max-w-[calc(100vw-2.5rem)] bg-white border border-slate-200 rounded-2xl shadow-2xl p-1.5 z-50 space-y-1 animate-fadeIn text-xs">
+                    <div className="absolute right-0 top-full mt-2 w-48 max-w-[calc(100vw-3rem)] bg-white border border-slate-200 rounded-2xl shadow-2xl p-1.5 z-50 space-y-1 animate-fadeIn text-xs">
                       {[
                         { id: 'ALL', label: 'All Transactions' },
                         { id: 'THIS_MONTH', label: 'This Month' },
@@ -556,7 +557,8 @@ export default function ProfilePage() {
                   onClick={refreshUserData}
                   className="text-xs text-indigo-600 hover:underline flex items-center gap-1 font-semibold px-2 py-1"
                 >
-                  <RefreshCw className="w-3.5 h-3.5" /> Refresh
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">Refresh</span>
                 </button>
               </div>
             </div>
@@ -585,7 +587,8 @@ export default function ProfilePage() {
                   return true;
                 });
 
-                const displayedPayments = showAllPayments ? filteredPayments : filteredPayments.slice(0, 3);
+                // Display 2 payments by default, 5 payments when "Show More" is clicked
+                const displayedPayments = showAllPayments ? filteredPayments.slice(0, 5) : filteredPayments.slice(0, 2);
 
                 if (filteredPayments.length === 0) {
                   return (
@@ -687,15 +690,19 @@ export default function ProfilePage() {
                       })}
                     </div>
 
-                    {/* Show More / Show Less Button */}
-                    {filteredPayments.length > 3 && (
+                    {/* Show More (5 Payments) / Show Less Button */}
+                    {filteredPayments.length > 2 && (
                       <div className="text-center pt-2 border-t border-slate-100">
                         <button
                           type="button"
                           onClick={() => setShowAllPayments(!showAllPayments)}
                           className="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition inline-flex items-center gap-1.5 border border-slate-200 shadow-sm"
                         >
-                          <span>{showAllPayments ? 'Show Less' : `Show More (${filteredPayments.length - 3} more)`}</span>
+                          <span>
+                            {showAllPayments
+                              ? 'Show Less (2 Payments)'
+                              : `Show More (${Math.min(5, filteredPayments.length)} Payments)`}
+                          </span>
                           {showAllPayments ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                         </button>
                       </div>
