@@ -1,12 +1,22 @@
 import React, { useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
-import { Search, Menu, ArrowRight } from 'lucide-react';
+import { Search, Menu, ArrowRight, User, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 
+const defaultAvatars = [
+  { id: 'hero_boy', label: '⚡ Hero Boy', icon: '👦', bg: 'bg-indigo-600' },
+  { id: 'star_girl', label: '🌟 Star Girl', icon: '👧', bg: 'bg-rose-500' },
+  { id: 'cyber_cat', label: '🐱 Cyber Cat', icon: '🐱', bg: 'bg-amber-500' },
+  { id: 'robo_ai', label: '🤖 Robo AI', icon: '🤖', bg: 'bg-sky-500' },
+  { id: 'astronaut', label: '🚀 Astronaut', icon: '🚀', bg: 'bg-purple-600' },
+  { id: 'ninja', label: '🥷 Ninja Dev', icon: '🥷', bg: 'bg-emerald-600' }
+];
+
 export default function Navbar({ title = 'Dashboard', onMenuClick }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
+  const [showProfileDropdown, setShowProfileDropdown] = useState(false);
   const navigate = useNavigate();
 
   // Full name of the user
@@ -14,6 +24,8 @@ export default function Navbar({ title = 'Dashboard', onMenuClick }) {
     ? user.name
     : (user?.email ? user.email.split('@')[0] : 'User');
   const firstInitial = fullName.trim().charAt(0).toUpperCase();
+
+  const selectedAvatarObj = defaultAvatars.find(a => a.id === user?.avatar);
 
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
@@ -119,16 +131,25 @@ export default function Navbar({ title = 'Dashboard', onMenuClick }) {
           )}
         </div>
 
-        {/* Right User Profile Bar (Logout Button Removed) */}
+        {/* Right User Profile Circle & Dropdown Popup */}
         {user && (
-          <div className="flex items-center border-l border-slate-200 pl-2 sm:pl-3">
-            <Link to="/profile" className="flex items-center space-x-2 text-xs text-slate-700 font-semibold hover:text-indigo-600 transition">
+          <div className="relative border-l border-slate-200 pl-2 sm:pl-3 z-30">
+            <button
+              type="button"
+              onClick={() => setShowProfileDropdown(!showProfileDropdown)}
+              className="flex items-center space-x-2 text-xs text-slate-700 font-semibold hover:text-indigo-600 transition focus:outline-none"
+              title="User account menu"
+            >
               {user.profilePicture ? (
                 <img
                   src={user.profilePicture}
                   alt="Avatar"
                   className="w-8 h-8 rounded-full object-cover border border-indigo-500 shadow-xs"
                 />
+              ) : selectedAvatarObj ? (
+                <div className={`w-8 h-8 rounded-full ${selectedAvatarObj.bg} text-white flex items-center justify-center font-extrabold text-sm shadow-xs`}>
+                  {selectedAvatarObj.icon}
+                </div>
               ) : (
                 <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center font-extrabold text-xs shadow-md">
                   {firstInitial}
@@ -138,7 +159,53 @@ export default function Navbar({ title = 'Dashboard', onMenuClick }) {
                 <span className="block leading-tight text-slate-900 font-bold">{fullName}</span>
                 <span className="text-[10px] text-indigo-600 font-bold uppercase">{user.subscription || 'free'}</span>
               </div>
-            </Link>
+            </button>
+
+            {/* Profile Dropdown Popup Box */}
+            {showProfileDropdown && (
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 z-50 animate-fadeIn text-xs space-y-3">
+                <div className="flex items-center gap-3 pb-2.5 border-b border-slate-100">
+                  {user.profilePicture ? (
+                    <img src={user.profilePicture} alt="Avatar" className="w-10 h-10 rounded-xl object-cover border border-indigo-500 shrink-0" />
+                  ) : selectedAvatarObj ? (
+                    <div className={`w-10 h-10 rounded-xl ${selectedAvatarObj.bg} text-white flex items-center justify-center font-extrabold text-lg shrink-0`}>
+                      {selectedAvatarObj.icon}
+                    </div>
+                  ) : (
+                    <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-base shrink-0">
+                      {firstInitial}
+                    </div>
+                  )}
+                  <div className="min-w-0 flex-1">
+                    <p className="font-extrabold text-slate-900 text-xs truncate leading-tight">{fullName}</p>
+                    <p className="text-[11px] text-slate-400 font-medium truncate">{user.email}</p>
+                    <span className="inline-block mt-1 text-[9px] font-black uppercase text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
+                      {user.subscription || 'free'} plan
+                    </span>
+                  </div>
+                </div>
+
+                <div className="space-y-1">
+                  <Link
+                    to="/profile"
+                    onClick={() => setShowProfileDropdown(false)}
+                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-bold transition"
+                  >
+                    <User className="w-4 h-4 text-indigo-600" /> Profile & Settings
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowProfileDropdown(false);
+                      logout();
+                    }}
+                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 font-bold transition text-left"
+                  >
+                    <LogOut className="w-4 h-4 text-rose-600" /> Logout
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>
