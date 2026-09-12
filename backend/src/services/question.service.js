@@ -219,23 +219,23 @@ function generateFallbackKitData(jobDescription, companyUrl, researchData, compa
   const questionTemplates = [
     {
       prompt: (c, r, s, i) => `[${s} Level] As a ${r} at ${c}, how do you execute core clinical / operational responsibilities under high-pressure scenarios?`,
-      answer: `1. Systematic initial assessment and triage based on established protocol\n2. Priority management and clear task delegation\n3. Strict adherence to ${c}'s safety, regulatory, and quality guidelines\n4. Post-procedure documentation and continuous quality evaluation`
+      answer: (c, r, s, i) => `1. Systematic initial assessment and triage based on established protocol\n2. Priority management and clear task delegation\n3. Strict adherence to ${c}'s safety, regulatory, and quality guidelines\n4. Post-procedure documentation and continuous quality evaluation`
     },
     {
       prompt: (c, r, s, i) => `[${s} Level] Describe your methodology for ensuring quality assurance, risk mitigation, and compliance for ${r} position.`,
-      answer: `1. Regular audit of operational processes and compliance standards\n2. Root-cause analysis for any procedural variances or errors\n3. Implementation of corrective action plans and staff training\n4. Active communication with regulatory bodies and internal audit teams`
+      answer: (c, r, s, i) => `1. Regular audit of operational processes and compliance standards\n2. Root-cause analysis for any procedural variances or errors\n3. Implementation of corrective action plans and staff training\n4. Active communication with regulatory bodies and internal audit teams`
     },
     {
       prompt: (c, r, s, i) => `[${s} Level] Walk us through a complex case or project you managed as ${r} that required cross-functional coordination.`,
-      answer: `1. Situation & Task overview outlining key objectives and constraints\n2. Collaborative action plan engaging interdisciplinary team members\n3. Overcoming communication barriers and resource bottlenecks\n4. Quantifiable positive outcome and key takeaways for ${c}`
+      answer: (c, r, s, i) => `1. Situation & Task overview outlining key objectives and constraints\n2. Collaborative action plan engaging interdisciplinary team members\n3. Overcoming communication barriers and resource bottlenecks\n4. Quantifiable positive outcome and key takeaways for ${c}`
     },
     {
       prompt: (c, r, s, i) => `[${s} Level] How do you handle unexpected complications or emergency situations while serving as ${r}?`,
-      answer: `1. Rapid critical thinking and emergency response protocols\n2. De-escalation techniques and calm, authoritative communication\n3. Immediate escalation to senior leadership / medical direction when required\n4. Thorough incident documentation and debriefing`
+      answer: (c, r, s, i) => `1. Rapid critical thinking and emergency response protocols\n2. De-escalation techniques and calm, authoritative communication\n3. Immediate escalation to senior leadership / medical direction when required\n4. Thorough incident documentation and debriefing`
     },
     {
       prompt: (c, r, s, i) => `[${s} Level] Describe a situation where you had to adapt quickly to new protocols or technology platforms at ${c}.`,
-      answer: `1. Proactive learning mindset and quick adoption of updated guidelines\n2. Hands-on practice and peer knowledge-sharing\n3. Validating competency through testing and supervisor evaluation\n4. Assisting team members in seamless transition`
+      answer: (c, r, s, i) => `1. Proactive learning mindset and quick adoption of updated guidelines\n2. Hands-on practice and peer knowledge-sharing\n3. Validating competency through testing and supervisor evaluation\n4. Assisting team members in seamless transition`
     }
   ];
 
@@ -252,12 +252,16 @@ function generateFallbackKitData(jobDescription, companyUrl, researchData, compa
     const qTmpl = questionTemplates[templateIdx];
     const fcTmpl = flashcardTemplates[templateIdx];
 
+    const generatedAnswer = typeof qTmpl.answer === 'function'
+      ? qTmpl.answer(finalCompanyName, finalRoleTitle, finalSeniority, i + 1)
+      : qTmpl.answer;
+
     questions.push({
       id: `Q-${i + 1}`,
       requirement_ids: [`REQ-${(i % 5) + 1}`],
       category: categories[i % categories.length],
       prompt: qTmpl.prompt(finalCompanyName, finalRoleTitle, finalSeniority, i + 1),
-      answer_outline: `${qTmpl.answer}\n5. Seniority Depth (${finalSeniority}): Tailored execution reflecting professional standards and leadership expectations.`,
+      answer_outline: `${generatedAnswer}\n5. Seniority Depth (${finalSeniority}): Tailored execution reflecting professional standards and leadership expectations.`,
       difficulty: (i % 3) + 1,
       completed: false,
       state: 'generated'

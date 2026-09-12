@@ -32,9 +32,9 @@ async function createKit(req, res) {
     return res.status(401).json({ error: 'Authentication required to create prep kit.' });
   }
 
-  // Check user subscription & kit limit from database
+  // Check user subscription & kit limit from database for COMPLETED kits only
   try {
-    let currentCount = await Kit.countDocuments({ userId });
+    let currentCount = await Kit.countDocuments({ userId, status: 'completed' });
     let subscription = 'free';
 
     const user = await User.findById(userId);
@@ -88,9 +88,9 @@ async function createKit(req, res) {
 }
 
 async function runPipelineInBackground(kitId, jobDescription, companyUrl, daysAvailable, companyName, roleTitle, seniorityLevel, userId) {
-  const updateStatus = async (status) => {
+  const updateStatus = async (stage) => {
     try {
-      await Kit.updateOne(getKitQuery(kitId, userId), { $set: { status, updatedAt: new Date() } });
+      await Kit.updateOne(getKitQuery(kitId, userId), { $set: { status: stage, updatedAt: new Date() } });
     } catch (e) {}
   };
 
@@ -115,6 +115,13 @@ async function runPipelineInBackground(kitId, jobDescription, companyUrl, daysAv
   } catch (err) {
     logger.error(`[Kit Controller] Pipeline failed for ${kitId}: ${err.message}`);
     await Kit.updateOne(getKitQuery(kitId, userId), { $set: { status: 'failed', errorMessage: err.message } }).catch(() => {});
+    // Purge failed kit draft after 15 seconds so polling displays the error but no empty/failed kit remains in DB
+    setTimeout(async () => {
+      try {
+        await Kit.deleteOne(getKitQuery(kitId, userId));
+        logger.info(`[Kit Controller] Cleaned up failed kit draft ${kitId}`);
+      } catch (e) {}
+    }, 15000);
   }
 }
 
@@ -123,7 +130,14 @@ async function getKitStatus(req, res) {
   const userId = req.user?.userId || req.user?.id;
   try {
     const kit = await Kit.findOne(getKitQuery(id, userId));
-    if (!kit) return res.status(404).json({ error: 'Kit not found' });
+    if (!kit) {
+      return res.json({
+        id,
+        status: 'failed',
+        readiness: 'yellow',
+        errorMessage: "Kit generation failed or was cancelled. No kit was created."
+      });
+    }
 
     res.json({
       id: kit.id || kit._id,
@@ -175,8 +189,12 @@ async function getKit(req, res) {
 async function listKits(req, res) {
   const userId = req.user?.userId || req.user?.id;
   try {
-    const kits = await Kit.find({ userId }).sort({ createdAt: -1 }).limit(50);
-    res.json(kits.map(k => {
+    // Purge any stale failed kits
+    Kit.deleteMany({ userId, status: 'failed' }).catch(() => {});
+    
+    const kits = await Kit.find({ userId, status: 'completed' }).sort({ createdAt: -1 }).limit(50);
+    const validKits = kits.filter(k => k.questions && k.questions.length > 0);
+    res.json(validKits.map(k => {
       const obj = k.toObject ? k.toObject() : k;
       obj.id = obj.id || obj._id;
       return syncKitSchedule(obj);

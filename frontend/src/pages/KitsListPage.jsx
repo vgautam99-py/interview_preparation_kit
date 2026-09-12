@@ -41,7 +41,8 @@ export default function KitsListPage() {
     setLoading(true);
     try {
       const res = await api.get('/kits');
-      setKits(res.data || []);
+      const validKits = (res.data || []).filter(k => k.status === 'completed' && k.questions && k.questions.length > 0);
+      setKits(validKits);
     } catch (err) {
       console.error('Failed to load kits from DB:', err);
       toast.error('Could not fetch kits from server');

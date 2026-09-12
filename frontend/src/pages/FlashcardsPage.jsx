@@ -42,7 +42,7 @@ export default function FlashcardsPage() {
     setLoading(true);
     try {
       const res = await api.get('/kits');
-      const fetchedKits = res.data || [];
+      const fetchedKits = (res.data || []).filter(k => k.status === 'completed' && k.questions && k.questions.length > 0);
       setKits(fetchedKits);
 
       const urlKitId = searchParams.get('kitId');

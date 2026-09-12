@@ -139,10 +139,10 @@ export default function PlansPage() {
                       <div className="space-y-2">
                         <button
                           onClick={() => handleRazorpayUpgrade(plan.id, plan.name, amountVal)}
-                          className={`w-full font-extrabold px-3 py-3.5 rounded-2xl transition text-xs sm:text-sm flex items-center justify-center gap-1.5 shadow-md ${plan.buttonColor}`}
+                          className={`w-full font-extrabold px-4 py-3.5 rounded-2xl transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md ${plan.buttonColor}`}
                         >
                           <CreditCard className="w-4 h-4 shrink-0" />
-                          <span className="whitespace-nowrap">Pay {plan.price} via Razorpay</span>
+                          <span className="truncate">Subscribe Plan ({plan.price})</span>
                           <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                         </button>
 

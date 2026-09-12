@@ -31,7 +31,8 @@ export default function DashboardPage() {
   const fetchKits = async () => {
     try {
       const res = await api.get('/kits');
-      setKits(res.data);
+      const validKits = (res.data || []).filter(k => k.status === 'completed' && k.questions && k.questions.length > 0);
+      setKits(validKits);
     } catch (err) {
       console.error('Failed to load kits:', err);
     } finally {
