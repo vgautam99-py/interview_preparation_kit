@@ -1,0 +1,28 @@
+{
+  "name": "interviewkit-backend",
+  "version": "1.0.0",
+  "description": "Backend API & AI Pipeline for AI Interview Prep Kit",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "jest --detectOpenHandles"
+  },
+  "dependencies": {
+    "@google/generative-ai": "^0.21.0",
+    "axios": "^1.7.9",
+    "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.2",
+    "razorpay": "^2.9.5",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}

@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables & secrets (CRITICAL for security)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# Build output
+dist/
+**/dist/
+build/
+**/build/
+*.tsbuildinfo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Editor & IDE files
+.vscode/
+.idea/
+*.suo
+*.ntvsopt
+*.njsproj
+*.sln
+*.sw?
+
+# OS metadata files
+.DS_Store
+Thumbs.db
+Desktop.ini

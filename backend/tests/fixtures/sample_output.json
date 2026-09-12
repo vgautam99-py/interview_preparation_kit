@@ -1,0 +1,406 @@
+[
+  {
+    "id": "case_1",
+    "status": "ok",
+    "kit": {
+      "source": {
+        "company": "Example",
+        "company_url": "https://example.com",
+        "role": "Senior Full-Stack Engineer",
+        "location": "Remote / Hybrid",
+        "jd_chars": 259,
+        "researched_at": "2026-09-10T02:10:30.072Z",
+        "pages_used": [
+          "https://example.com/"
+        ]
+      },
+      "company_brief": {
+        "summary": "Example is actively seeking a Senior Full-Stack Engineer to drive technical engineering and product delivery.",
+        "what_they_do": "Provides web services, scalable APIs, and software solutions tailored for modern business operations.",
+        "sources": [
+          "https://example.com/"
+        ],
+        "state": "generated"
+      },
+      "role": {
+        "title": "Senior Full-Stack Engineer",
+        "seniority": "Senior",
+        "responsibilities": [
+          "Architect and implement reliable web applications and microservices",
+          "Lead code reviews, enforce design standards, and mentor engineers",
+          "Ensure system reliability, security compliance, and performance optimization"
+        ],
+        "requirements": [
+          "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills.",
+          "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills.",
+          "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills.",
+          "Familiarity with Automated Testing, CI/CD pipelines, and Cloud Deployment",
+          "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills."
+        ]
+      },
+      "requirements": [
+        {
+          "id": "REQ-1",
+          "text": "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills.",
+          "kind": "technical",
+          "priority": "must"
+        },
+        {
+          "id": "REQ-2",
+          "text": "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills.",
+          "kind": "technical",
+          "priority": "must"
+        },
+        {
+          "id": "REQ-3",
+          "text": "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills.",
+          "kind": "technical",
+          "priority": "must"
+        },
+        {
+          "id": "REQ-4",
+          "text": "Familiarity with Automated Testing, CI/CD pipelines, and Cloud Deployment",
+          "kind": "technical",
+          "priority": "must"
+        },
+        {
+          "id": "REQ-5",
+          "text": "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills.",
+          "kind": "behavioral",
+          "priority": "nice"
+        }
+      ],
+      "questions": [
+        {
+          "id": "Q-1",
+          "requirement_ids": [
+            "REQ-1"
+          ],
+          "category": "System Design",
+          "prompt": "How would you architect a scalable system to support the requirements of Senior Full-Stack Engineer at Example?",
+          "answer_outline": "1. Modular architecture decomposition\n2. Database indexing & query optimization\n3. Caching and rate limiting strategies",
+          "difficulty": 3,
+          "state": "generated"
+        },
+        {
+          "id": "Q-2",
+          "requirement_ids": [
+            "REQ-2"
+          ],
+          "category": "Technical",
+          "prompt": "Explain event loop microtask vs macrotask queuing in Node.js and how async performance bottlenecks are diagnosed.",
+          "answer_outline": "1. Process.nextTick vs setImmediate\n2. Profiling event loop lag\n3. Worker threads vs cluster module",
+          "difficulty": 2,
+          "state": "generated"
+        },
+        {
+          "id": "Q-3",
+          "requirement_ids": [
+            "REQ-3"
+          ],
+          "category": "Technical",
+          "prompt": "How do you design high-availability MongoDB schema indexes to prevent unindexed query collection scans?",
+          "answer_outline": "1. Compound index key order (ESR rule)\n2. Explain plan examination\n3. Write concern vs read preference",
+          "difficulty": 2,
+          "state": "generated"
+        },
+        {
+          "id": "Q-4",
+          "requirement_ids": [
+            "REQ-4"
+          ],
+          "category": "DevOps / Architecture",
+          "prompt": "Describe your end-to-end CI/CD setup for automated testing and zero-downtime deployment.",
+          "answer_outline": "1. Automated linting & unit testing stages\n2. Blue-green or canary deployments\n3. Rollback automation",
+          "difficulty": 2,
+          "state": "generated"
+        },
+        {
+          "id": "Q-5",
+          "requirement_ids": [
+            "REQ-5"
+          ],
+          "category": "Behavioral",
+          "prompt": "Describe a situation where you had to manage conflicting technical priorities under a tight deadline.",
+          "answer_outline": "1. STAR method (Situation, Task, Action, Result)\n2. Clear trade-off evaluation\n3. Stakeholder alignment",
+          "difficulty": 1,
+          "state": "generated"
+        }
+      ],
+      "flashcards": [
+        {
+          "id": "FC-1",
+          "requirement_ids": [
+            "REQ-1"
+          ],
+          "front": "What is the ESR (Equal, Sort, Range) rule in database indexing?",
+          "back": "Place Equality fields first, Sort fields second, and Range fields last in compound indexes.",
+          "confidence": 0,
+          "state": "generated"
+        },
+        {
+          "id": "FC-2",
+          "requirement_ids": [
+            "REQ-2"
+          ],
+          "front": "What is the difference between process.nextTick and setImmediate in Node.js?",
+          "back": "process.nextTick fires immediately after current operation completes; setImmediate runs in Check phase.",
+          "confidence": 0,
+          "state": "generated"
+        },
+        {
+          "id": "FC-3",
+          "requirement_ids": [
+            "REQ-3"
+          ],
+          "front": "What is SSRF and how do you mitigate it?",
+          "back": "Server-Side Request Forgery occurs when server fetches untrusted URLs; mitigate by validating protocol and blocking private IP ranges.",
+          "confidence": 0,
+          "state": "generated"
+        }
+      ],
+      "schedule": {
+        "days_available": 3,
+        "days": [
+          {
+            "day": 1,
+            "focus": "High-Priority Architecture & Must-Have Concepts",
+            "question_ids": [
+              "Q-1",
+              "Q-4"
+            ],
+            "minutes": 45
+          },
+          {
+            "day": 2,
+            "focus": "Core Technical Deep Dives & System Design",
+            "question_ids": [
+              "Q-2",
+              "Q-5"
+            ],
+            "minutes": 35
+          },
+          {
+            "day": 3,
+            "focus": "Final Practice, Mock Review & Company Culture",
+            "question_ids": [
+              "Q-3"
+            ],
+            "minutes": 30
+          }
+        ]
+      },
+      "coverage": {
+        "uncovered_requirement_ids": [],
+        "passes": 1
+      }
+    }
+  },
+  {
+    "id": "case_2",
+    "status": "ok",
+    "kit": {
+      "source": {
+        "company": "Example",
+        "company_url": "https://example.com/careers",
+        "role": "Backend Developer",
+        "location": "Remote / Hybrid",
+        "jd_chars": 175,
+        "researched_at": "2026-09-10T02:10:30.197Z",
+        "pages_used": []
+      },
+      "company_brief": {
+        "summary": "Example is actively seeking a Backend Developer to drive technical engineering and product delivery.",
+        "what_they_do": "Provides web services, scalable APIs, and software solutions tailored for modern business operations.",
+        "sources": [],
+        "state": "generated"
+      },
+      "role": {
+        "title": "Backend Developer",
+        "seniority": "Senior",
+        "responsibilities": [
+          "Architect and implement reliable web applications and microservices",
+          "Lead code reviews, enforce design standards, and mentor engineers",
+          "Ensure system reliability, security compliance, and performance optimization"
+        ],
+        "requirements": [
+          "Backend Developer at CloudScale. Requirements: Strong proficiency in Node.js, microservices architecture, Docker, CI/CD, and Redis caching. Must have system design experience.",
+          "Backend Developer at CloudScale. Requirements: Strong proficiency in Node.js, microservices architecture, Docker, CI/CD, and Redis caching. Must have system design experience.",
+          "Hands-on experience with MongoDB / Relational Databases & Schema Design",
+          "Backend Developer at CloudScale. Requirements: Strong proficiency in Node.js, microservices architecture, Docker, CI/CD, and Redis caching. Must have system design experience.",
+          "Excellent communication, problem-solving, and cross-functional collaboration"
+        ]
+      },
+      "requirements": [
+        {
+          "id": "REQ-1",
+          "text": "Backend Developer at CloudScale. Requirements: Strong proficiency in Node.js, microservices architecture, Docker, CI/CD, and Redis caching. Must have system design experience.",
+          "kind": "technical",
+          "priority": "must"
+        },
+        {
+          "id": "REQ-2",
+          "text": "Backend Developer at CloudScale. Requirements: Strong proficiency in Node.js, microservices architecture, Docker, CI/CD, and Redis caching. Must have system design experience.",
+          "kind": "technical",
+          "priority": "must"
+        },
+        {
+          "id": "REQ-3",
+          "text": "Hands-on experience with MongoDB / Relational Databases & Schema Design",
+          "kind": "technical",
+          "priority": "must"
+        },
+        {
+          "id": "REQ-4",
+          "text": "Backend Developer at CloudScale. Requirements: Strong proficiency in Node.js, microservices architecture, Docker, CI/CD, and Redis caching. Must have system design experience.",
+          "kind": "technical",
+          "priority": "must"
+        },
+        {
+          "id": "REQ-5",
+          "text": "Excellent communication, problem-solving, and cross-functional collaboration",
+          "kind": "behavioral",
+          "priority": "nice"
+        }
+      ],
+      "questions": [
+        {
+          "id": "Q-1",
+          "requirement_ids": [
+            "REQ-1"
+          ],
+          "category": "System Design",
+          "prompt": "How would you architect a scalable system to support the requirements of Backend Developer at Example?",
+          "answer_outline": "1. Modular architecture decomposition\n2. Database indexing & query optimization\n3. Caching and rate limiting strategies",
+          "difficulty": 3,
+          "state": "generated"
+        },
+        {
+          "id": "Q-2",
+          "requirement_ids": [
+            "REQ-2"
+          ],
+          "category": "Technical",
+          "prompt": "Explain event loop microtask vs macrotask queuing in Node.js and how async performance bottlenecks are diagnosed.",
+          "answer_outline": "1. Process.nextTick vs setImmediate\n2. Profiling event loop lag\n3. Worker threads vs cluster module",
+          "difficulty": 2,
+          "state": "generated"
+        },
+        {
+          "id": "Q-3",
+          "requirement_ids": [
+            "REQ-3"
+          ],
+          "category": "Technical",
+          "prompt": "How do you design high-availability MongoDB schema indexes to prevent unindexed query collection scans?",
+          "answer_outline": "1. Compound index key order (ESR rule)\n2. Explain plan examination\n3. Write concern vs read preference",
+          "difficulty": 2,
+          "state": "generated"
+        },
+        {
+          "id": "Q-4",
+          "requirement_ids": [
+            "REQ-4"
+          ],
+          "category": "DevOps / Architecture",
+          "prompt": "Describe your end-to-end CI/CD setup for automated testing and zero-downtime deployment.",
+          "answer_outline": "1. Automated linting & unit testing stages\n2. Blue-green or canary deployments\n3. Rollback automation",
+          "difficulty": 2,
+          "state": "generated"
+        },
+        {
+          "id": "Q-5",
+          "requirement_ids": [
+            "REQ-5"
+          ],
+          "category": "Behavioral",
+          "prompt": "Describe a situation where you had to manage conflicting technical priorities under a tight deadline.",
+          "answer_outline": "1. STAR method (Situation, Task, Action, Result)\n2. Clear trade-off evaluation\n3. Stakeholder alignment",
+          "difficulty": 1,
+          "state": "generated"
+        }
+      ],
+      "flashcards": [
+        {
+          "id": "FC-1",
+          "requirement_ids": [
+            "REQ-1"
+          ],
+          "front": "What is the ESR (Equal, Sort, Range) rule in database indexing?",
+          "back": "Place Equality fields first, Sort fields second, and Range fields last in compound indexes.",
+          "confidence": 0,
+          "state": "generated"
+        },
+        {
+          "id": "FC-2",
+          "requirement_ids": [
+            "REQ-2"
+          ],
+          "front": "What is the difference between process.nextTick and setImmediate in Node.js?",
+          "back": "process.nextTick fires immediately after current operation completes; setImmediate runs in Check phase.",
+          "confidence": 0,
+          "state": "generated"
+        },
+        {
+          "id": "FC-3",
+          "requirement_ids": [
+            "REQ-3"
+          ],
+          "front": "What is SSRF and how do you mitigate it?",
+          "back": "Server-Side Request Forgery occurs when server fetches untrusted URLs; mitigate by validating protocol and blocking private IP ranges.",
+          "confidence": 0,
+          "state": "generated"
+        }
+      ],
+      "schedule": {
+        "days_available": 5,
+        "days": [
+          {
+            "day": 1,
+            "focus": "High-Priority Architecture & Must-Have Concepts",
+            "question_ids": [
+              "Q-1"
+            ],
+            "minutes": 30
+          },
+          {
+            "day": 2,
+            "focus": "Core Technical Deep Dives & System Design",
+            "question_ids": [
+              "Q-2"
+            ],
+            "minutes": 30
+          },
+          {
+            "day": 3,
+            "focus": "Focused Module Practice — Day 3",
+            "question_ids": [
+              "Q-3"
+            ],
+            "minutes": 30
+          },
+          {
+            "day": 4,
+            "focus": "Focused Module Practice — Day 4",
+            "question_ids": [
+              "Q-4"
+            ],
+            "minutes": 30
+          },
+          {
+            "day": 5,
+            "focus": "Final Practice, Mock Review & Company Culture",
+            "question_ids": [
+              "Q-5"
+            ],
+            "minutes": 30
+          }
+        ]
+      },
+      "coverage": {
+        "uncovered_requirement_ids": [],
+        "passes": 1
+      }
+    }
+  }
+]

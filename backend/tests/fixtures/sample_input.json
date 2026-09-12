@@ -1,0 +1,14 @@
+[
+  {
+    "id": "case_1",
+    "jobDescription": "Senior Full-Stack Engineer at TechCorp. Requirements: 5+ years of experience with Node.js, Express, React, TypeScript, and MongoDB. Experience designing REST APIs, handling database indexing, and writing automated unit tests. Strong team communication skills.",
+    "companyUrl": "https://example.com",
+    "daysAvailable": 3
+  },
+  {
+    "id": "case_2",
+    "jobDescription": "Backend Developer at CloudScale. Requirements: Strong proficiency in Node.js, microservices architecture, Docker, CI/CD, and Redis caching. Must have system design experience.",
+    "companyUrl": "https://example.com/careers",
+    "daysAvailable": 5
+  }
+]

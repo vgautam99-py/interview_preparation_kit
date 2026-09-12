@@ -1,0 +1,16 @@
+{
+  "name": "interviewkit",
+  "version": "1.0.0",
+  "description": "AI Interview Prep Kit - Master Blueprint Implementation",
+  "main": "backend/src/server.js",
+  "scripts": {
+    "start:backend": "node backend/src/server.js",
+    "dev:backend": "node --watch backend/src/server.js",
+    "dev:frontend": "npm run dev --prefix frontend",
+    "evaluate": "node backend/scripts/evaluate.js",
+    "test": "npm test --prefix backend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
