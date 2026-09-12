@@ -147,7 +147,7 @@ export default function KitsListPage() {
                 to="/create"
                 className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs shadow-md transition flex items-center gap-2"
               >
-                <Plus className="w-4 h-4 font-bold" /> + Create Kit
+                Generate Interview Kit
               </Link>
             </div>
 
@@ -233,7 +233,7 @@ export default function KitsListPage() {
                 to="/create"
                 className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-xs shadow-md transition"
               >
-                <PlusCircle className="w-4 h-4" /> + Create Interview Kit
+                Generate Interview Kit
               </Link>
             </div>
           ) : tabFilter === 'All' && !searchTerm ? (

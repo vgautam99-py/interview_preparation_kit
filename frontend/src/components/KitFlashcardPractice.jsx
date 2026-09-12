@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../lib/api';
-import { Eye, Target, RefreshCw, Trophy, ArrowLeft, Check } from 'lucide-react';
+import { Eye, Target, RefreshCw, Trophy, ArrowLeft, Check, ChevronLeft, ChevronRight } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function KitFlashcardPractice({ kitId, initialCards = [], seniority = 'Mid-Level' }) {
@@ -24,28 +24,24 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
   const loadFlashcards = async (id, weakMode = false) => {
     setLoading(true);
     try {
-      const res = await api.get(`/practice/${id}/flashcards${weakMode ? '?mode=weak' : ''}`);
-      let loaded = res.data?.flashcards || [];
-      if (weakMode) {
-        loaded = [...loaded].sort((a, b) => (a.confidence || 0) - (b.confidence || 0));
-      }
-      setCards(loaded);
-    } catch (err) {
-      console.error('Failed to load flashcards:', err);
-    } finally {
-      setLoading(false);
+      const res = await api.get(`/practice/${id}/flashcards${weakMode ? '?weakOnly=true' : ''}`);
+      setCards(res.data || []);
       setCurrentIndex(0);
       setIsRevealed(false);
       setSelectedConfidence(null);
       setSessionCompleted(false);
-      setIsWeakMode(weakMode);
+    } catch (err) {
+      console.error('Failed to load flashcards:', err);
+      toast.error('Failed to load flashcards');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handlePracticeWeakCards = () => {
-    if (!kitId) return;
-    toast.success('Practice Weak Cards mode activated! Prioritizing lowest confidence first.');
-    loadFlashcards(kitId, true);
+    const newWeakMode = !isWeakMode;
+    setIsWeakMode(newWeakMode);
+    loadFlashcards(kitId, newWeakMode);
   };
 
   const handleSelectConfidence = async (level) => {
@@ -71,6 +67,14 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
       } catch (e) {
         console.error('Failed to save confidence:', e);
       }
+    }
+  };
+
+  const handlePrevCard = () => {
+    if (currentIndex > 0) {
+      setCurrentIndex(prev => prev - 1);
+      setIsRevealed(false);
+      setSelectedConfidence(null);
     }
   };
 
@@ -344,12 +348,23 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
               })}
             </div>
 
-            <div className="text-center pt-2">
+            {/* Dual Navigation Controls: Previous and Next Buttons */}
+            <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+              <button
+                onClick={handlePrevCard}
+                disabled={currentIndex === 0}
+                className="flex-1 sm:flex-none px-6 py-3 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-800 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 border border-slate-200 shadow-sm"
+              >
+                <ChevronLeft className="w-4 h-4" />
+                <span>Previous</span>
+              </button>
+
               <button
                 onClick={handleNextCard}
-                className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black shadow-md transition flex items-center justify-center gap-2 mx-auto"
+                className="flex-1 sm:flex-none px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md hover:shadow-indigo-600/30"
               >
-                Next Card →
+                <span>Next</span>
+                <ChevronRight className="w-4 h-4" />
               </button>
             </div>
           </div>

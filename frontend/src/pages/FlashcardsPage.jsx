@@ -5,6 +5,8 @@ import Sidebar from '../components/layout/Sidebar';
 import api from '../lib/api';
 import {
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   RotateCcw,
   Trophy,
   RefreshCw,
@@ -352,7 +354,7 @@ export default function FlashcardsPage() {
                 to="/create"
                 className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-xl text-xs shadow-md transition"
               >
-                <PlusCircle className="w-4 h-4" /> + Create Interview Kit
+                Generate Interview Kit
               </Link>
             </div>
           ) : sessionCompleted ? (
@@ -511,13 +513,23 @@ export default function FlashcardsPage() {
                   })}
                 </div>
 
-                {/* Next Card Button */}
-                <div className="text-center pt-2">
+                {/* Dual Navigation Controls: Previous and Next Buttons */}
+                <div className="flex items-center justify-between gap-3 pt-3 border-t border-slate-100">
+                  <button
+                    onClick={handlePrevCard}
+                    disabled={currentIndex === 0}
+                    className="flex-1 sm:flex-none px-6 py-3 bg-slate-100 hover:bg-slate-200 disabled:opacity-40 disabled:cursor-not-allowed text-slate-800 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 border border-slate-200 shadow-sm"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>Previous</span>
+                  </button>
+
                   <button
                     onClick={handleNextCard}
-                    className="w-full sm:w-auto px-8 py-3.5 bg-slate-900 hover:bg-slate-800 text-white rounded-xl text-xs font-black shadow-md transition flex items-center justify-center gap-2 mx-auto"
+                    className="flex-1 sm:flex-none px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 shadow-md hover:shadow-indigo-600/30"
                   >
-                    Next Card →
+                    <span>Next</span>
+                    <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
               </div>

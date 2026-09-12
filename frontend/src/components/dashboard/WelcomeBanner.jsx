@@ -37,8 +37,7 @@ export default function WelcomeBanner({ totalKits = 0 }) {
         to="/create"
         className="bg-white hover:bg-slate-100 text-indigo-700 font-bold px-6 py-3 rounded-2xl shadow-lg flex items-center gap-2 text-xs transition whitespace-nowrap"
       >
-        <PlusCircle className="w-4 h-4 text-indigo-600" />
-        Create New Kit
+        Generate Interview Kit
       </Link>
     </div>
   );

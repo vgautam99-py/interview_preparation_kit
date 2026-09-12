@@ -363,9 +363,7 @@ Requirements:
                       <span>Generating Interview Kit...</span>
                     </>
                   ) : (
-                    <>
-                      <span>✦ Generate Interview Kit →</span>
-                    </>
+                    <span>Generate Interview Kit</span>
                   )}
                 </button>
               </div>

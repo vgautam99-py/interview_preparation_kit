@@ -153,7 +153,7 @@ export default function DashboardPage() {
                   to="/create"
                   className="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2.5 rounded-xl text-xs shadow-md transition"
                 >
-                  <PlusCircle className="w-4 h-4" /> + Create Interview Kit
+                  Generate Interview Kit
                 </Link>
               </div>
             ) : (
