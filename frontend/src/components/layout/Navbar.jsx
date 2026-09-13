@@ -163,47 +163,24 @@ export default function Navbar({ title = 'Dashboard', onMenuClick }) {
 
             {/* Profile Dropdown Popup Box */}
             {showProfileDropdown && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-2xl p-3 z-50 animate-fadeIn text-xs space-y-3">
-                <div className="flex items-center gap-3 pb-2.5 border-b border-slate-100">
-                  {user.profilePicture ? (
-                    <img src={user.profilePicture} alt="Avatar" className="w-10 h-10 rounded-xl object-cover border border-indigo-500 shrink-0" />
-                  ) : selectedAvatarObj ? (
-                    <div className={`w-10 h-10 rounded-xl ${selectedAvatarObj.bg} text-white flex items-center justify-center font-extrabold text-lg shrink-0`}>
-                      {selectedAvatarObj.icon}
-                    </div>
-                  ) : (
-                    <div className="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-extrabold text-base shrink-0">
-                      {firstInitial}
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <p className="font-extrabold text-slate-900 text-xs truncate leading-tight">{fullName}</p>
-                    <p className="text-[11px] text-slate-400 font-medium truncate">{user.email}</p>
-                    <span className="inline-block mt-1 text-[9px] font-black uppercase text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-100">
-                      {user.subscription || 'free'} plan
-                    </span>
-                  </div>
-                </div>
-
-                <div className="space-y-1">
-                  <Link
-                    to="/profile"
-                    onClick={() => setShowProfileDropdown(false)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-xl text-slate-700 hover:bg-slate-50 font-bold transition"
-                  >
-                    <User className="w-4 h-4 text-indigo-600" /> Profile & Settings
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowProfileDropdown(false);
-                      logout();
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 rounded-xl text-rose-600 hover:bg-rose-50 font-bold transition text-left"
-                  >
-                    <LogOut className="w-4 h-4 text-rose-600" /> Logout
-                  </button>
-                </div>
+              <div className="absolute right-0 top-full mt-2 w-44 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 animate-fadeIn text-xs space-y-1">
+                <Link
+                  to="/profile"
+                  onClick={() => setShowProfileDropdown(false)}
+                  className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-slate-700 hover:bg-indigo-50 hover:text-indigo-600 font-bold transition"
+                >
+                  <User className="w-4 h-4 text-indigo-600" /> Profile
+                </Link>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowProfileDropdown(false);
+                    logout();
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-rose-600 hover:bg-rose-50 font-bold transition text-left"
+                >
+                  <LogOut className="w-4 h-4 text-rose-600" /> Logout
+                </button>
               </div>
             )}
           </div>
