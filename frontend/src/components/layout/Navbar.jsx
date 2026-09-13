@@ -61,11 +61,11 @@ export default function Navbar({ title = 'Dashboard', onMenuClick }) {
         )}
 
         {/* Viper Logo & Name */}
-        <Link to="/dashboard" className="flex items-center space-x-2">
+        <Link to="/dashboard" className="flex items-center space-x-2 shrink-0">
           <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center font-extrabold text-white text-xs shadow-md shadow-indigo-600/30 flex-shrink-0">
             V
           </div>
-          <span className="font-extrabold text-slate-900 text-base sm:text-lg tracking-tight">
+          <span className={`font-extrabold text-slate-900 text-base sm:text-lg tracking-tight ${isMobileSearchOpen ? 'hidden md:inline-block' : 'inline-block'}`}>
             ViperAI
           </span>
         </Link>
@@ -75,7 +75,7 @@ export default function Navbar({ title = 'Dashboard', onMenuClick }) {
       <div className="flex-1 min-w-0" />
 
       {/* Search Bar & Profile Section */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 shrink-0">
         {/* Desktop Search Input (Always visible on medium screens & above) */}
         <form onSubmit={handleSearchSubmit} className="hidden md:flex items-center gap-2 max-w-md w-64 lg:w-80">
           <div className="relative w-full flex items-center">
@@ -98,17 +98,17 @@ export default function Navbar({ title = 'Dashboard', onMenuClick }) {
         </form>
 
         {/* Mobile Expandable Search (Sliding Right-to-Left towards Logo) */}
-        <div className="md:hidden flex items-center relative">
+        <div className="md:hidden flex items-center relative max-w-[160px] sm:max-w-[220px]">
           {isMobileSearchOpen ? (
-            <form onSubmit={handleSearchSubmit} className="flex items-center animate-fadeIn">
-              <div className="relative flex items-center">
+            <form onSubmit={handleSearchSubmit} className="flex items-center animate-fadeIn w-full">
+              <div className="relative flex items-center w-full">
                 <input
                   type="text"
                   autoFocus
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Search..."
-                  className="w-44 sm:w-56 pl-3 pr-8 py-1.5 bg-slate-50 border border-indigo-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 font-medium placeholder-slate-400 shadow-sm transition-all duration-300"
+                  className="w-full pl-3 pr-8 py-1.5 bg-slate-50 border border-indigo-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 font-medium placeholder-slate-400 shadow-sm transition-all duration-300"
                 />
                 <button
                   type="button"
@@ -133,7 +133,7 @@ export default function Navbar({ title = 'Dashboard', onMenuClick }) {
 
         {/* Right User Profile Circle & Dropdown Popup */}
         {user && (
-          <div className="relative border-l border-slate-200 pl-2 sm:pl-3 z-30">
+          <div className="relative border-l border-slate-200 pl-2 sm:pl-3 z-30 shrink-0">
             <button
               type="button"
               onClick={() => setShowProfileDropdown(!showProfileDropdown)}
