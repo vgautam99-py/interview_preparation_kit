@@ -309,11 +309,7 @@ export default function KitFlashcardPractice({ kitId, initialCards = [], seniori
                   </p>
                 </div>
 
-                <div className="flex justify-center pt-2">
-                  <div className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-sm shadow-inner">
-                    ↓
-                  </div>
-                </div>
+
               </div>
             )}
           </div>
