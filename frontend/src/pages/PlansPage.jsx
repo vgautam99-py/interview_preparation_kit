@@ -142,7 +142,7 @@ export default function PlansPage() {
                           className={`w-full font-extrabold px-4 py-3.5 rounded-2xl transition text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md ${plan.buttonColor}`}
                         >
                           <CreditCard className="w-4 h-4 shrink-0" />
-                          <span className="truncate">Subscribe Plan ({plan.price})</span>
+                          <span>Subscribe</span>
                           <ArrowRight className="w-3.5 h-3.5 shrink-0" />
                         </button>
 
